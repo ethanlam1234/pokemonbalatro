@@ -119,6 +119,19 @@ body {
   animation:floatDmg 0.9s ease forwards;
   transform:translateX(-50%);
 }
+
+/* ── DISCARD ANIMATION ── */
+@keyframes discardFly {
+  0%   { transform:rotate(var(--tilt,0deg)) translateY(0) rotateY(0deg) rotateZ(0deg) scale(1); opacity:1; }
+  15%  { transform:rotate(var(--tilt,0deg)) translateY(-18px) translateX(30px) rotateY(-12deg) rotateZ(-4deg) scale(1.05); opacity:1; }
+  60%  { transform:rotate(var(--tilt,0deg)) translateY(-40px) translateX(200px) rotateY(-35deg) rotateZ(-12deg) scale(0.85); opacity:0.7; }
+  100% { transform:rotate(var(--tilt,0deg)) translateY(-20px) translateX(520px) rotateY(-55deg) rotateZ(-20deg) scale(0.5); opacity:0; }
+}
+.hc.discarding {
+  animation:discardFly var(--discard-dur, 0.55s) var(--discard-delay, 0s) cubic-bezier(0.4,0,0.8,0.6) forwards !important;
+  pointer-events:none !important;
+  z-index:200 !important;
+}
 @keyframes floatDmg {
   0%{opacity:1;transform:translateX(-50%) translateY(0) scale(0.8)}
   20%{transform:translateX(-50%) translateY(-10px) scale(1.2)}
@@ -128,6 +141,7 @@ body {
   position:fixed; bottom:clamp(160px,18vh,220px); left:0; right:0;
   display:flex; flex-direction:row; justify-content:center; align-items:flex-end;
   padding-bottom:0; pointer-events:none; z-index:100; overflow:visible;
+  perspective:1200px; transform-style:preserve-3d;
 }
 .hc {
   width:clamp(110px,9.2vw,148px); flex:0 0 auto; margin:0 -12px;
@@ -180,8 +194,7 @@ body {
 
 
 /* ── GOLD DISPLAY (above deck) ── */
-/* gold-display repurposed — shown inline in owned-items header row */
-#gold-display { display:none; } /* legacy — now rendered inside owned-items-panel header */
+/* gold-display is the span inside owned-items-panel header */
 /* ── DEAL GHOST (deck→hand animation) ── */
 .deal-ghost { position:fixed; pointer-events:none; z-index:999; width:clamp(44px,3.8vw,62px); aspect-ratio:2/3; border-radius:6px; overflow:hidden; background:repeating-linear-gradient(135deg,#1a1060 0,#1a1060 6px,#110a44 6px,#110a44 12px); border:2px solid #334488; box-shadow:0 4px 20px rgba(0,0,0,0.85); transform-origin:50% 50%; will-change:transform,opacity; }
 .deal-ghost::after { content:''; position:absolute; inset:3px; border-radius:4px; border:1px solid rgba(100,140,255,0.3); }
@@ -205,15 +218,16 @@ body {
 /* Trainer portrait — two separate blocks */
 #rp-portrait { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
 #rp-portrait-img-wrap {
-  width:85%; aspect-ratio:1/1; overflow:hidden; flex-shrink:0;
+  width:100%; aspect-ratio:4/3; overflow:hidden; flex-shrink:0;
   border-radius:8px; background:#0a0a18;
   border:2px solid rgba(50,70,140,0.6);
   box-shadow:0 4px 14px rgba(0,0,0,0.7);
-  align-self:center;
+  align-self:stretch;
 }
 #rp-portrait-img-wrap img {
-  width:100%; height:100%; object-fit:cover; object-position:center 10%;
-  image-rendering:pixelated; display:block; filter:brightness(0.9);
+  width:100%; height:100%; object-fit:cover; object-position:center 55%;
+  image-rendering:pixelated; display:block; filter:brightness(0.95);
+  transform:scale(2.2); transform-origin:center 55%;
 }
 #rp-portrait-overlay {
   background:rgba(8,10,26,0.94);
@@ -321,7 +335,7 @@ body {
 #owned-items-panel {
   position:fixed; top:10px; right:10px; z-index:111;
   display:none; flex-direction:column; gap:5px; align-items:flex-end;
-  max-width:clamp(160px,16vw,220px); pointer-events:none;
+  max-width:clamp(160px,16vw,220px); pointer-events:all;
   font-family:'PokemonClassic',monospace;
 }
 #owned-items-label {
@@ -335,6 +349,7 @@ body {
   display:flex; align-items:center; gap:5px;
   animation:chipIn 0.3s cubic-bezier(0.2,1.2,0.3,1) both;
   box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  cursor:default; pointer-events:all;
 }
 @keyframes chipIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
 
@@ -389,27 +404,23 @@ body {
   display:flex; gap:3px; justify-content:center; flex-wrap:wrap;
 }
 #route-confirm-btn {
-  opacity:0.35; pointer-events:none; filter:saturate(0);
-  transition:opacity 0.2s, filter 0.2s;
-}
-#route-confirm-btn.lit {
-  margin-top:18px; display:none;
   background:linear-gradient(180deg,#224466,#112233);
   border:2px solid #44aaff; border-radius:8px;
   color:#fff; font-family:'PokemonClassic',monospace;
   font-size:clamp(10px,1.2vw,16px); padding:10px 28px;
   cursor:pointer; letter-spacing:2px;
   box-shadow:0 4px 0 #061122,0 0 16px rgba(50,150,255,0.3);
-  transition:transform 0.1s, filter 0.15s;
+  opacity:0.35; pointer-events:none; filter:saturate(0);
+  transition:opacity 0.2s, filter 0.2s, transform 0.1s;
 }
 #route-confirm-btn:hover { filter:brightness(1.3); transform:translateY(-2px); }
 #route-pick-label {
   font-size:clamp(10px,1.1vw,15px); color:#aabbee; letter-spacing:1px; margin-bottom:16px;
 }
 /* Day Care */
-#daycare-screen { gap:0; }
+#daycare-screen { gap:clamp(14px,2.5vh,28px); }
 .daycare-action-row {
-  display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;
+  display:flex; gap:clamp(12px,2vw,24px); flex-wrap:wrap; justify-content:center; margin-bottom:0;
 }
 .daycare-action {
   background:rgba(8,10,26,0.95); border:2px solid rgba(50,70,140,0.5);
@@ -422,7 +433,7 @@ body {
 .daycare-action-name { font-size:clamp(11px,1.2vw,16px); color:#ccd6f0; display:block; margin-bottom:6px; }
 .daycare-action-desc { font-size:clamp(8px,0.82vw,11px); color:#667788; line-height:1.6; }
 #daycare-card-picker {
-  display:none; flex-direction:column; align-items:center; gap:10px; margin-top:10px;
+  display:none; flex-direction:column; align-items:center; gap:14px; margin-top:0;
 }
 #daycare-card-picker.visible { display:flex; }
 #daycare-picker-label { font-size:clamp(10px,1.1vw,15px); color:#aabbee; letter-spacing:1px; }
@@ -442,7 +453,7 @@ body {
 .dc-xp-bar { position:absolute; bottom:0; left:0; right:0; height:4px; background:rgba(255,200,0,0.15); }
 .dc-xp-fill { height:100%; background:linear-gradient(90deg,#ffcc00,#ffee44); transition:width 0.4s; }
 .between-skip {
-  margin-top:18px; background:rgba(20,24,48,0.8); border:1px solid rgba(60,80,140,0.5);
+  margin-top:0; background:rgba(20,24,48,0.8); border:1px solid rgba(60,80,140,0.5);
   border-radius:6px; color:#556677; font-family:'PokemonClassic',monospace;
   font-size:clamp(9px,0.9vw,13px); padding:7px 20px; cursor:pointer;
   transition:all 0.15s; letter-spacing:1px;
@@ -451,18 +462,15 @@ body {
 
 
 #route-btn-row {
-  display:flex; flex-direction:column; align-items:center; gap:8px;
-  margin-top:22px; width:min(95vw,680px);
+  display:flex; flex-direction:column; align-items:center; gap:0;
+  margin-top:8px; width:min(95vw,680px);
 }
-#route-confirm-btn {
-  opacity:0.35; pointer-events:none; filter:saturate(0);
-  transition:opacity 0.2s, filter 0.2s;
-}
-#route-confirm-btn.lit {
-  /* always visible, dims when nothing selected */
-}
+#route-btn-row #route-confirm-btn { margin-top:28px; }
+/* route-confirm-btn styled in earlier block */
+
 #route-secondary-row {
   display:flex; flex-direction:row; gap:10px; align-items:center; justify-content:center;
+  margin-top:28px; margin-bottom:0;
 }
 #route-view-deck-btn {
   font-family:'PokemonClassic',monospace; font-size:clamp(9px,0.9vw,13px);
@@ -471,6 +479,141 @@ body {
   color:#7799bb; cursor:pointer; letter-spacing:1px; transition:all 0.15s;
 }
 #route-view-deck-btn:hover { color:#aaccff; border-color:rgba(100,140,255,0.7); }
+
+/* ── STARTER DECK PILE CHOOSER ── */
+#starter-arc-wrap {
+  display:flex !important; gap:clamp(40px,6vw,100px);
+  justify-content:center; align-items:flex-end;
+  padding:0 clamp(20px,4vw,60px);
+  max-width:100vw;
+  flex-wrap:nowrap; flex-shrink:0;
+}
+.deck-pile-chooser {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer; gap:10px; position:relative;
+  transition:transform 0.2s ease;
+}
+.deck-pile-chooser:hover { transform:translateY(-8px); }
+.deck-pile-chooser.chosen { transform:translateY(-14px); }
+/* The stacked cards container */
+.dpc-stack {
+  position:relative;
+  width:clamp(100px,10vw,140px);
+  aspect-ratio:2/3;
+}
+/* Each card in the stack */
+.dpc-card {
+  position:absolute; inset:0;
+  border-radius:8px; overflow:hidden;
+  background:#0a0a18;
+  border:2px solid #2a3a6a;
+  box-shadow:0 4px 16px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(80,110,200,0.2);
+  transition:box-shadow 0.2s;
+}
+.dpc-card img {
+  position:absolute; top:0; bottom:0; left:50%;
+  transform:translateX(-50%);
+  height:100%; width:auto;
+  object-fit:contain; image-rendering:pixelated;
+}
+/* Back cards (ghost cards behind top) */
+.dpc-back {
+  background:repeating-linear-gradient(135deg,#1a1060 0,#1a1060 6px,#110a44 6px,#110a44 12px);
+  border-color:rgba(70,50,160,0.6);
+}
+.dpc-back::after {
+  content:''; position:absolute; inset:4px;
+  border-radius:5px; border:1px solid rgba(100,80,200,0.3);
+}
+/* Deck label below stack */
+.dpc-label {
+  font-family:'PokemonClassic',monospace;
+  font-size:clamp(7px,0.72vw,10px);
+  color:#aabbdd; letter-spacing:1px; text-align:center;
+  text-transform:uppercase;
+  margin-top:14px; line-height:1.5;
+}
+.deck-pile-chooser.chosen .dpc-label { color:#ffdd66; }
+.deck-pile-chooser.chosen .dpc-card { border-color:#ffdd00; box-shadow:0 0 0 2px #ffdd00,0 0 20px rgba(255,210,0,0.4),0 4px 16px rgba(0,0,0,0.8); }
+
+/* ── DECK DETAIL SCREEN ── */
+#deck-detail-screen {
+  position:fixed; inset:0; z-index:2100;
+  display:none; flex-direction:column; align-items:center;
+  justify-content:flex-start; overflow-y:auto;
+  font-family:'PokemonClassic',monospace;
+  padding:clamp(20px,4vh,50px) clamp(16px,3vw,40px) clamp(16px,3vh,36px);
+  gap:clamp(16px,2.5vh,28px);
+  background:rgba(4,5,16,0.0); /* canvas shows through */
+}
+#deck-detail-screen.open { display:flex; }
+#dds-header {
+  display:flex; align-items:center; gap:16px;
+  width:100%; max-width:1100px; margin-bottom:clamp(12px,2vh,24px);
+  flex-shrink:0;
+}
+#dds-back-btn {
+  font-family:'PokemonClassic',monospace; font-size:clamp(9px,0.9vw,13px);
+  padding:7px 16px; background:rgba(20,24,48,0.9);
+  border:1px solid rgba(60,80,140,0.6); border-radius:6px;
+  color:#7799bb; cursor:pointer; letter-spacing:1px;
+  transition:all 0.15s; flex-shrink:0;
+}
+#dds-back-btn:hover { color:#aaccff; border-color:rgba(100,140,255,0.7); }
+#dds-deck-name {
+  font-size:clamp(14px,1.8vw,24px); color:#ffdd66; letter-spacing:3px; flex:1;
+  text-shadow:2px 2px 0 #000;
+}
+#dds-begin-btn {
+  font-family:'PokemonClassic',monospace; font-size:clamp(10px,1.1vw,15px);
+  padding:10px 24px;
+  background:linear-gradient(180deg,#cc9900,#885500);
+  border:2px solid #ffcc00; border-radius:8px;
+  color:#fff; cursor:pointer; letter-spacing:2px;
+  box-shadow:0 4px 0 #553300, 0 0 20px rgba(255,180,0,0.3);
+  transition:transform 0.1s; flex-shrink:0;
+  animation:starterBtnPulse 1.5s ease infinite;
+}
+#dds-begin-btn:hover { transform:translateY(-2px); }
+/* Info + cards two-column layout */
+#dds-body {
+  display:flex; gap:clamp(20px,3vw,40px);
+  width:100%; max-width:1100px; align-items:flex-start;
+  flex:1;
+}
+#dds-info {
+  flex-shrink:0; width:clamp(200px,22vw,300px);
+  background:rgba(8,10,26,0.92); border:2px solid rgba(50,70,140,0.5);
+  border-radius:10px; padding:clamp(12px,1.5vw,20px);
+  display:flex; flex-direction:column; gap:10px;
+}
+.dds-info-stat { display:flex; flex-direction:column; gap:3px; }
+.dds-info-label { font-size:clamp(7px,0.68vw,9px); color:#445566; letter-spacing:2px; text-transform:uppercase; }
+.dds-info-val   { font-size:clamp(9px,0.95vw,13px); color:#aabbdd; line-height:1.6; }
+.dds-info-val.green { color:#44cc88; }
+.dds-info-val.red   { color:#cc4455; }
+.dds-info-div { height:1px; background:rgba(50,70,140,0.3); }
+#dds-subtitle { font-size:clamp(9px,0.95vw,13px); color:#667788; line-height:1.6; }
+/* Cards grid */
+#dds-cards {
+  flex:1; display:flex; flex-wrap:wrap; gap:8px;
+  align-content:flex-start;
+}
+.dds-card-slot {
+  width:clamp(78px,8vw,110px); aspect-ratio:2/3;
+  animation:shopItemIn 0.3s var(--sd,0s) both;
+}
+
+/* ── CRT WARP: slight perspective curve on entire game ── */
+#crt-wrap {
+  position:fixed; inset:0; z-index:1;
+  pointer-events:none;
+  /* Subtle perspective push-in at corners */
+  transform:perspective(1800px) rotateX(0.8deg);
+  transform-origin:50% 50%;
+  /* Scale up slightly to hide border artifacts */
+  transform:perspective(1800px) rotateX(0.8deg) scale(1.02);
+}
 /* ── BOTTOM BAR tweaks ── */
 /* Sort row — bigger, white */
 #sort-row {
@@ -546,7 +689,7 @@ body {
 /* deck viewer type sizes inherit global */
 #dv-grid {
   display:flex; flex-wrap:wrap; gap:14px;
-  justify-content:center; width:100%; max-width:1100px;
+  justify-content:flex-start; width:100%; max-width:1100px;
 }
 .dv-card-slot {
   width:clamp(130px,12vw,170px); aspect-ratio:2/3;
@@ -811,17 +954,7 @@ body {
 @keyframes kwPopup { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.7) translateY(0);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1) translateY(-4px);}60%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(-14px);}100%{opacity:0;transform:translate(-50%,-50%) scale(0.9) translateY(-30px);} }
 
 
-/* ── DECK CHOICE CARDS ── */
-#starter-arc-wrap {
-  display:flex !important;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:clamp(10px,1.5vw,18px);
-  padding:0 clamp(10px,2vw,30px);
-  max-width:min(98vw,1200px);
-  align-items:stretch;
-  flex-shrink:0;
-}
+/* ── DECK CHOICE CARDS (arc-wrap defined earlier for deck piles) ── */
 .deck-choice-card {
   width:clamp(150px,15vw,210px); min-height:clamp(220px,22vh,320px);
   background:rgba(8,10,26,0.95);
@@ -984,8 +1117,8 @@ body {
 @keyframes shopSelected { 50%{transform:scale(1.15);}100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(255,220,80,0.9));} }
 .shop-hc-wrap .hc { width:100%; height:100%; margin:0; transform:none!important; border-radius:8px; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,0.9); }
 .shop-hc-wrap .hc-type1 { left:auto !important; right:3px !important; }
-#shop-skip-btn { margin-top:24px; background:rgba(30,30,50,0.8); border:1px solid #334; border-radius:6px; color:#667; font-family:'PokemonClassic',monospace; font-size:clamp(8px,0.9vw,12px); padding:7px 18px; cursor:pointer; letter-spacing:1px; transition:all 0.15s; }
-#shop-skip-btn:hover { color:#99aacc; border-color:#556; }
+#shop-skip-btn { margin-top:24px; background:rgba(16,20,48,0.92); border:2px solid rgba(80,100,180,0.7); border-radius:8px; color:#aabbdd; font-family:'PokemonClassic',monospace; font-size:clamp(10px,1.0vw,14px); padding:10px 26px; cursor:pointer; letter-spacing:2px; transition:all 0.18s; box-shadow:0 4px 0 rgba(0,0,16,0.5),0 0 12px rgba(60,80,200,0.2); }
+#shop-skip-btn:hover { color:#ffffff; border-color:rgba(140,160,255,0.9); background:rgba(30,36,80,0.95); transform:translateY(-2px); box-shadow:0 6px 0 rgba(0,0,16,0.5),0 0 18px rgba(80,100,255,0.3); }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    MOBILE — landscape phones/tablets (height ≤ 500px OR narrow landscape)
@@ -1077,6 +1210,10 @@ body {
   #route-pick-label { font-size:9px !important; }
   #route-pokemon-row { gap:7px !important; margin-top:8px !important; padding-top:8px !important; }
   .card-visual      { border-width:1px !important; }
+  #route-secondary-row { margin-top:8px !important; }
+  #route-btn-row #route-confirm-btn { margin-top:10px !important; }
+  #route-view-deck-btn { font-size:9px !important; padding:5px 12px !important; }
+  .between-skip { font-size:9px !important; }
   #route-confirm-btn {
   opacity:0.35; pointer-events:none; filter:saturate(0);
   transition:opacity 0.2s, filter 0.2s;
@@ -1121,6 +1258,102 @@ body {
 <!-- ── BALATRO SHADER BACKGROUND — with gym color uniforms ── -->
 <canvas id="balatro-bg" style="position:fixed;inset:0;z-index:-2;pointer-events:none;width:100vw;height:100vh;opacity:1;"></canvas>
 <div id="balatro-overlay" style="position:fixed;inset:0;z-index:-1;background:rgba(4,6,18,0.78);pointer-events:none;"></div>
+
+<!-- ── CRT SCREEN EFFECT OVERLAY ── -->
+<canvas id="crt-canvas" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:9000;pointer-events:none;"></canvas>
+<script>
+(function(){
+  const canvas = document.getElementById('crt-canvas');
+  const gl = canvas.getContext('webgl', {alpha:true, premultipliedAlpha:false});
+  if(!gl){ console.warn('CRT: no webgl'); return; }
+
+  const vert = `
+attribute vec2 position;
+varying vec2 vUv;
+void main(){
+  vUv = position * 0.5 + 0.5;
+  gl_Position = vec4(position, 0.0, 1.0);
+}`;
+
+  const frag = `
+precision mediump float;
+varying vec2 vUv;
+uniform float iTime;
+uniform vec2 iResolution;
+
+void main(){
+  vec2 uv = vUv;
+
+  // ── Scanlines ─────────────────────────────────────────
+  // Each physical pixel row alternates slightly — creates ~2px bands
+  float scanlineY = uv.y * iResolution.y * 0.5;
+  float sl = sin(scanlineY * 3.14159265 * 2.0);
+  // Dark bands every 2 pixels, 28% opacity max
+  float scanline = 0.28 * (0.5 - 0.5 * sl);
+
+  // ── Slow rolling horizontal bright line (TV interlace) ─
+  float rollSpeed = iTime * 0.12;
+  float rollY = fract(uv.y - rollSpeed);
+  float roll = 0.04 * smoothstep(0.0, 0.02, rollY) * smoothstep(0.05, 0.02, rollY);
+
+  // ── Subtle RGB fringe near scanline edges ─────────────
+  float fringe = 0.012 * abs(sin(scanlineY * 3.14159265 * 2.0 + 0.3));
+
+  // ── Phosphor flicker at monitor refresh rate ──────────
+  float flicker = 0.015 * sin(iTime * 72.0);
+
+  // ── Very rare horizontal noise streak ────────────────
+  float noise = fract(sin(floor(uv.y * iResolution.y * 0.5) * 127.1 + iTime * 0.6) * 43758.5);
+  float streak = step(0.997, noise) * 0.07;
+
+  // Compose: dark overlay with varying alpha
+  float alpha = scanline + flicker + streak - roll;
+  alpha = clamp(alpha, 0.0, 0.55);
+
+  // Very slight warm tint to simulate phosphor
+  gl_FragColor = vec4(0.01, 0.0, 0.02, alpha);
+}`;
+
+  function compile(type, src){
+    const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s;
+  }
+  const prog=gl.createProgram();
+  gl.attachShader(prog,compile(gl.VERTEX_SHADER,vert));
+  gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,frag));
+  gl.linkProgram(prog); gl.useProgram(prog);
+
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(prog,'position');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+
+  const uTime=gl.getUniformLocation(prog,'iTime');
+  const uRes=gl.getUniformLocation(prog,'iResolution');
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  function resize(){
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  }
+  window.addEventListener('resize',resize); resize();
+
+  let start=performance.now();
+  function frame(){
+    const t=(performance.now()-start)*0.001;
+    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime,t);
+    gl.uniform2f(uRes,canvas.width,canvas.height);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
 
 <script>
 (function(){
@@ -1477,7 +1710,7 @@ document.addEventListener('keydown',e=>{
 });
 </script>
 
-<div id="gold-display" style="display:none;">$4</div>
+<!-- gold-display is inside owned-items-panel -->
 <!-- ── DECK PILE (fixed position) ── -->
 <div class="deck-pile" id="deck-ours" style="display:none;" onclick="openDeckViewer()">
   <div class="deck-card"></div><div class="deck-card"></div><div class="deck-card"></div>
@@ -1892,9 +2125,16 @@ function renderHand(animateLast) {
     const tilt = getTilt(card.id || (card.name + i));
     el.style.setProperty('--tilt', tilt + 'deg');
     if(G_selected.has(i)) el.classList.add('selected-hand');
-    if(animateLast && i === n - 1) {
-      el.style.opacity = '0';
-      requestAnimationFrame(() => dealFromDeckToHand(el, card, 'ours'));
+    if(_dealAnimating.has(i)) {
+      // This card is mid-animation — keep it invisible
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
+    } else if(animateLast && i === n - 1) {
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
+      const cardTilt = tilt;
+      const cardIndex = i;
+      requestAnimationFrame(() => dealFromDeckToHand(el, card, 'ours', cardTilt, cardIndex));
     }
     const art = document.createElement('img');
     art.className = 'hc-art'; art.draggable = false;
@@ -1970,14 +2210,86 @@ function updatePlayHandBtn() {
   btn.textContent = sel > 0 ? `PLAY ${sel}` : 'SELECT CARDS';
 }
 
-function discardSelected() {
+async function discardSelected() {
   if(!G.ourTurn || G.animating || G_selected.size === 0) return;
   if(G.discardsLeft <= 0) { return; }
+  G.animating = true;
   G.discardsLeft--;
-  const toRemove = Array.from(G_selected).sort((a,b)=>b-a);
+
+  const selectedIndices = Array.from(G_selected).sort((a,b) => a-b);
+  const hcEls = [...document.querySelectorAll('#hand-container .hc')];
+
+  const CARD_DUR = 0.58;
+  const STAGGER  = 0.09;
+
+  // For each selected card: clone a fixed ghost at exact position, animate it, hide original
+  selectedIndices.forEach((idx, n) => {
+    const orig = hcEls[idx];
+    if(!orig) return;
+    const rect = orig.getBoundingClientRect();
+    // Create ghost at exact same screen position
+    const ghost = document.createElement('div');
+    ghost.style.cssText = [
+      `position:fixed`,
+      `left:${rect.left}px`, `top:${rect.top}px`,
+      `width:${rect.width}px`, `height:${rect.height}px`,
+      `border-radius:8px`, `overflow:hidden`,
+      `background:#0a0a18`, `border:2px solid rgba(50,70,140,0.5)`,
+      `z-index:500`,
+      `pointer-events:none`,
+      `perspective:600px`,
+      `transform-style:preserve-3d`,
+      `transform:rotate(${(parseFloat(orig.style.getPropertyValue('--tilt'))||0)}deg)`,
+      `box-shadow:0 4px 14px rgba(0,0,0,0.8)`,
+      `will-change:transform,opacity`
+    ].join(';');
+    // Copy the art image into the ghost
+    const artImg = orig.querySelector('.hc-art');
+    if(artImg) {
+      const gi = document.createElement('img');
+      gi.src = artImg.src; gi.draggable = false;
+      gi.style.cssText = `position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);height:100%;width:auto;object-fit:contain;image-rendering:pixelated;`;
+      ghost.appendChild(gi);
+    }
+    // Copy type badges
+    orig.querySelectorAll('.hc-type1,.hc-type2').forEach(b=>{
+      ghost.appendChild(b.cloneNode(true));
+    });
+    document.body.appendChild(ghost);
+    // Hide original immediately
+    orig.style.opacity = '0';
+    orig.style.pointerEvents = 'none';
+
+    // Start animation after stagger delay
+    const delay_ms = n * STAGGER * 1000;
+    setTimeout(() => {
+      const tilt = parseFloat(orig.style.getPropertyValue('--tilt')) || 0;
+      ghost.style.transition = `transform ${CARD_DUR}s cubic-bezier(0.25,0,0.6,0.8), opacity ${CARD_DUR}s ease`;
+      ghost.style.transform = [
+        `rotate(${tilt - 15}deg)`,
+        `translateX(${window.innerWidth * 0.7 + 200}px)`,
+        `translateY(-60px)`,
+        `rotateY(-70deg)`,
+        `rotateZ(-18deg)`,
+        `scale(0.45)`
+      ].join(' ');
+      ghost.style.opacity = '0';
+      setTimeout(() => ghost.remove(), CARD_DUR * 1000 + 50);
+    }, delay_ms);
+  });
+
+  // Wait for all animations to finish
+  await delay(Math.round((CARD_DUR + selectedIndices.length * STAGGER) * 1000) + 80);
+
+  // Update game state
+  const toRemove = Array.from(G_selected).sort((a,b) => b-a);
   toRemove.forEach(i => { if(G.hand[i]) G.hand.splice(i,1); });
   G_selected.clear();
+  _activeHandType = null;
+
+  G.animating = false;
   renderHand();
+  renderHandsPanel();
   autoFillHand(() => { renderHand(); updateRunPanel(); });
 }
 
@@ -2220,16 +2532,12 @@ function showHandScore(handName, chips, mult, totalDmg, cards) {
   const overlay = document.createElement('div');
   overlay.id = 'hand-score-overlay';
   overlay.style.cssText = `
-    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+    position:fixed; left:50%; top:clamp(180px,26vh,300px); transform:translateX(-50%);
     z-index:700; pointer-events:none;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center;
     gap:clamp(6px,1vh,12px);
-    padding:clamp(20px,3vh,40px) clamp(28px,4vw,60px);
-    background:radial-gradient(ellipse 110% 90% at 52% 48%, rgba(4,6,20,0.97) 60%, rgba(2,4,14,0.82) 80%, transparent 100%);
-    border-radius:18px 24px 20px 22px / 22px 18px 24px 20px;
-    box-shadow:0 0 80px 20px rgba(0,0,0,0.7), 0 0 0 1px rgba(40,60,120,0.25);
     animation:scoreOverlayIn 0.25s ease forwards;
-    width:max-content; max-width:min(94vw,680px);
+    white-space:nowrap; width:max-content;
   `;
 
   // Hand name banner
@@ -2273,7 +2581,7 @@ function showHandScore(handName, chips, mult, totalDmg, cards) {
 
   const totalEl = document.createElement('div');
   totalEl.style.cssText = `font-family:'PokemonClassic',monospace;font-size:clamp(22px,3vw,44px);
-    color:#ffdd44; text-shadow:0 0 20px rgba(255,200,0,0.8); letter-spacing:2px;`;
+    color:#ffdd44; text-shadow:0 0 20px rgba(255,200,0,0.8); letter-spacing:2px; white-space:nowrap;`;
   totalEl.textContent = totalDmg + ' DMG';
 
   mathRow.append(chipsEl, multSymbol, multEl, eqEl, totalEl);
@@ -2451,15 +2759,21 @@ async function playSelectedHand() {
   G.trainerHp = Math.max(0, G.trainerHp - totalDmg);
   updatePortraits();
 
-  // Damage number
-  const dmgEl = document.createElement('div');
-  dmgEl.style.cssText = `position:fixed;left:${window.innerWidth/2}px;top:${window.innerHeight*0.18}px;font-family:'PokemonClassic',monospace;font-weight:bold;font-size:clamp(28px,4vw,60px);color:#ff4444;text-shadow:2px 2px 0 #000;z-index:800;pointer-events:none;transform:translateX(-50%);animation:floatDmg 1.1s ease forwards;`;
-  dmgEl.textContent = '-'+totalDmg;
-  document.body.appendChild(dmgEl);
-  setTimeout(()=>dmgEl.remove(), 1200);
+  // damage number spawned after score overlay disappears
 
+  // Spawn damage number now that score overlay is removed
+  // Spawn damage number over the trainer portrait
+  const dmgEl2 = document.createElement('div');
+  const portraitWrap = document.getElementById('rp-portrait-img-wrap');
+  const pRect = portraitWrap ? portraitWrap.getBoundingClientRect() : null;
+  const dmgLeft = pRect ? (pRect.left + pRect.width/2) : window.innerWidth*0.1;
+  const dmgTop  = pRect ? (pRect.top  + pRect.height*0.4) : window.innerHeight*0.2;
+  dmgEl2.style.cssText = `position:fixed;left:${dmgLeft}px;top:${dmgTop}px;font-family:'PokemonClassic',monospace;font-weight:bold;font-size:clamp(24px,3.5vw,52px);color:#ff2222;text-shadow:2px 2px 0 #000,0 0 16px rgba(255,40,0,0.8);z-index:800;pointer-events:none;transform:translateX(-50%);animation:floatDmg 1.4s ease forwards;`;
+  dmgEl2.textContent = '-'+totalDmg;
+  document.body.appendChild(dmgEl2);
+  setTimeout(()=>dmgEl2.remove(), 1500);
   document.getElementById('hand-score-overlay')?.remove();
-  await delay(200);
+  await delay(300);
   G.animating = false;
   renderHand();
 
@@ -2582,11 +2896,21 @@ function openDayCareScreen() {
   hideGameUIForInterlude();
   _daycareAction = null; _daycareCardIdx = null;
   document.getElementById('daycare-card-picker').classList.remove('visible');
+  // Restore action row and subtitle
+  const actionRow = document.querySelector('#daycare-screen .daycare-action-row');
+  const subtitle  = document.querySelector('#daycare-screen .between-subtitle');
+  if(actionRow) actionRow.style.display = '';
+  if(subtitle)  subtitle.style.display  = '';
   document.getElementById('daycare-screen').classList.add('visible');
 }
 
 function selectDaycareAction(action) {
   _daycareAction = action;
+  // Hide the 3 action buttons and subtitle
+  const actionRow = document.querySelector('#daycare-screen .daycare-action-row');
+  const subtitle  = document.querySelector('#daycare-screen .between-subtitle');
+  if(actionRow) actionRow.style.display = 'none';
+  if(subtitle)  subtitle.style.display  = 'none';
   const labels = {
     release:  'Select a card to RELEASE from your deck:',
     breed:    'Select a card to DUPLICATE:',
@@ -2688,8 +3012,8 @@ let _dvSort = 'species';
 
 const DV_HIDE_IDS = [
   'run-panel','hd-row','hands-panel','hand-container','balatro-bottom',
-  'owned-items-panel','deck-ours','game-hud',
-  'shop-screen','route-screen','daycare-screen','route-map-screen'
+  'owned-items-panel','deck-ours','game-hud'
+  // Note: between-screens are NOT hidden here — their own open/close manages them
 ];
 
 function openDeckViewer() {
@@ -2708,11 +3032,14 @@ function closeDeckViewer() {
   const viewer = document.getElementById('deck-viewer');
   if(!viewer) return;
   viewer.classList.remove('open');
-  // Restore all hidden elements
+  // Restore elements that were visible before (dvWasHidden was something non-none)
   DV_HIDE_IDS.forEach(id => {
     const el = document.getElementById(id);
     if(el && el.dataset.dvWasHidden !== undefined) {
-      el.style.display = el.dataset.dvWasHidden || '';
+      // Only restore if it was visible before (non-empty, non-none)
+      const prev = el.dataset.dvWasHidden;
+      if(prev && prev !== 'none') el.style.display = prev;
+      else if(prev === '') el.style.display = '';  // was using CSS class
       delete el.dataset.dvWasHidden;
     }
   });
@@ -2930,59 +3257,96 @@ function attachPopover(el, text) {
 function renderOppHand(animateLast) { return; }
 
 // ── DEAL FROM DECK ANIMATION ──────────────────────────────────
-async function dealFromDeckToHand(destEl, card, side) {
+// Track which hand indices are currently being animated
+const _dealAnimating = new Set();
+
+async function dealFromDeckToHand(destEl, card, side, cardTilt, cardIndex) {
+  // Mark the card index in hand so we can reveal the live element after animation
+  const cardName = card ? card.name : null;
+  if(cardIndex !== undefined) _dealAnimating.add(cardIndex);
   await new Promise(r=>setTimeout(r,50));
-  const deckEl=document.getElementById(side==='ours'?'deck-ours':'deck-theirs');
-  if(!deckEl){destEl.style.opacity='';return;}
-  const isOurs=side==='ours';
-  const topCard=deckEl.querySelector('.deck-card:last-child');
-  if(topCard){topCard.classList.add('popping');topCard.addEventListener('animationend',()=>topCard.classList.remove('popping'),{once:true});}
-  const dr=deckEl.getBoundingClientRect();
-  const er=destEl.getBoundingClientRect();
-  const deckCx=dr.left+dr.width/2,deckCy=dr.top+dr.height/2;
-  const handCx=er.left+er.width/2,handCy=er.top+er.height/2;
-  const deckW=dr.width,handW=er.width||deckW*1.3;
-  const ghost=document.createElement('div'); ghost.className='deal-ghost';
-  const face=document.createElement('div'); face.className='face';
-  if(isOurs&&card){
-    const img=document.createElement('img'); removeWhiteBg(card.fusionImg||card.img,url=>{img.src=url;});
-    const stats=document.createElement('div'); stats.className='hc-stats';
-    const a=document.createElement('span'); a.className='hc-atk'; a.textContent=card.dexA||card.atk;
-    const h=document.createElement('span'); h.className='hc-hp';  h.textContent=card.dexB||card.hp;
-    stats.append(a,h); face.append(img,stats);
+  const deckEl = document.getElementById(side==='ours'?'deck-ours':'deck-theirs');
+  if(!deckEl){ destEl.style.opacity=''; return; }
+  const isOurs = side==='ours';
+  const topCard = deckEl.querySelector('.deck-card:last-child');
+  if(topCard){ topCard.classList.add('popping'); topCard.addEventListener('animationend',()=>topCard.classList.remove('popping'),{once:true}); }
+
+  const dr = deckEl.getBoundingClientRect();
+  const er = destEl.getBoundingClientRect();
+  const deckCx = dr.left+dr.width/2, deckCy = dr.top+dr.height/2;
+  const handCx = er.left+er.width/2,  handCy = er.top+er.height/2;
+
+  // Build ghost with full card art + 3D perspective
+  const ghostWrap = document.createElement('div');
+  ghostWrap.style.cssText = `position:fixed;left:${deckCx}px;top:${deckCy}px;z-index:999;pointer-events:none;perspective:500px;`;
+  const ghost = document.createElement('div');
+  ghost.className = 'deal-ghost';
+  ghost.style.cssText = `position:relative;width:${er.width||60}px;aspect-ratio:2/3;transform-origin:50% 50%;transform-style:preserve-3d;border-radius:8px;overflow:hidden;background:#0a0a18;border:2px solid #334488;box-shadow:0 4px 20px rgba(0,0,0,0.85);will-change:transform,opacity;`;
+
+  // Back face
+  const back = document.createElement('div');
+  back.style.cssText = `position:absolute;inset:0;border-radius:7px;background:repeating-linear-gradient(135deg,#1a1060 0,#1a1060 6px,#110a44 6px,#110a44 12px);backface-visibility:visible;`;
+  ghost.appendChild(back);
+
+  // Front face (card art)
+  const frontFace = document.createElement('div');
+  frontFace.style.cssText = `position:absolute;inset:0;border-radius:7px;background:#0a0a18;backface-visibility:hidden;opacity:0;`;
+  if(isOurs && card){
+    const img = document.createElement('img'); img.draggable=false;
+    img.style.cssText=`position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);height:100%;width:auto;object-fit:contain;image-rendering:pixelated;`;
+    removeWhiteBg(card.fusionImg||card.img, url=>{ img.src=url; });
+    frontFace.appendChild(img);
+    if(card.type1) frontFace.appendChild(typeBadge(card.type1,'hc-type1'));
+    if(card.type2) frontFace.appendChild(typeBadge(card.type2,'hc-type2'));
   }
-  ghost.appendChild(face); document.body.appendChild(ghost);
-  ghost.style.left=deckCx+'px'; ghost.style.top=deckCy+'px';
-  ghost.style.transform='translate(-50%,-50%) rotate('+(isOurs?-10:10)+'deg) scale(1)';
-  const d=(ms)=>new Promise(r=>setTimeout(r,ms));
-  const fanRot=isOurs?(parseFloat(getComputedStyle(destEl).getPropertyValue('--tilt'))||0):0;
+  ghost.appendChild(frontFace);
+  ghostWrap.appendChild(ghost);
+  document.body.appendChild(ghostWrap);
+
+  // Initial: at deck, face-down, rotated back
+  ghost.style.transform = `rotateY(-90deg) scale(1)`;
+  ghostWrap.style.transform = `translate(-50%,-50%)`;
+
+  const d = ms => new Promise(r=>setTimeout(r,ms));
+  const fanRot = isOurs ? (cardTilt || parseFloat(destEl.style.getPropertyValue('--tilt'))||0) : 0;
+
   if(!isOurs){
-    ghost.style.transition='left 0.42s cubic-bezier(0.25,0.8,0.3,1),top 0.42s cubic-bezier(0.25,0.8,0.3,1),transform 0.42s ease';
-    ghost.style.left=(window.innerWidth/2)+'px'; ghost.style.top='60px';
-    ghost.style.transform='translate(-50%,-50%) rotate(180deg) scale(1)';
-    await d(380); ghost.style.transition='opacity 0.09s ease'; ghost.style.opacity='0';
-    await d(100); ghost.remove(); destEl.style.opacity=''; return;
+    ghostWrap.style.transition = `left 0.38s ease, top 0.38s ease`;
+    ghostWrap.style.left = (window.innerWidth/2)+'px';
+    ghostWrap.style.top  = '60px';
+    await d(350); ghostWrap.style.opacity='0'; await d(100); ghostWrap.remove(); return;
   }
-  ghost.classList.add('pulling');
-  ghost.style.transition='left 0.12s ease-out,top 0.12s ease-out,transform 0.12s ease';
-  ghost.style.left=(deckCx-30)+'px'; ghost.style.top=(deckCy-20)+'px';
-  ghost.style.transform='translate(-50%,-50%) rotate(-8deg) scale(1.05)';
-  await d(130);
-  ghost.classList.remove('pulling');
-  ghost.style.transition='transform 0.1s ease-in';
-  ghost.style.transform='translate(-50%,-50%) rotate(0deg) scale(1.05) scaleX(0.04)';
+
+  // Phase 1: flip from back to front (90deg → 0deg)
+  ghost.style.transition = `transform 0.18s ease-in`;
+  ghost.style.transform   = `rotateY(0deg) scale(1.0)`;
   await d(100);
-  face.style.display='block'; ghost.style.background='transparent'; ghost.style.border='none'; ghost.style.boxShadow='none';
-  ghost.style.transition='transform 0.12s ease-out';
-  ghost.style.transform='translate(-50%,-50%) rotate(0deg) scale(1.05) scaleX(1)';
-  await d(130);
-  ghost.style.transition=['left 0.30s cubic-bezier(0.3,0,0.5,1)','top 0.30s cubic-bezier(0.55,0,0.4,1)','transform 0.30s cubic-bezier(0.2,0.8,0.3,1)','opacity 0.08s ease 0.22s'].join(',');
-  ghost.style.left=handCx+'px'; ghost.style.top=handCy+'px';
-  ghost.style.transform=`translate(-50%,-50%) rotate(${fanRot}deg) scale(2.1)`;
+  frontFace.style.opacity = '1'; back.style.opacity = '0';
+
+  // Phase 2: arc from deck position to hand
+  ghostWrap.style.transition = [
+    `left 0.32s cubic-bezier(0.3,0,0.5,1)`,
+    `top 0.32s cubic-bezier(0.55,0,0.35,1)`
+  ].join(',');
+  ghost.style.transition = `transform 0.32s cubic-bezier(0.2,0.8,0.3,1)`;
+  ghostWrap.style.left = handCx+'px';
+  ghostWrap.style.top  = handCy+'px';
+  ghost.style.transform = `rotateY(${fanRot*0.3}deg) scale(1.0)`;
   await d(300);
-  ghost.style.transition='transform 0.12s cubic-bezier(0.4,0,0.6,1),opacity 0.09s ease';
-  ghost.style.transform=`translate(-50%,-50%) rotate(${fanRot}deg) scale(1.35)`;
-  await d(80); ghost.style.opacity='0'; await d(80); ghost.remove(); destEl.style.opacity='';
+
+  // Phase 3: land into hand
+  ghost.style.transition = `transform 0.12s cubic-bezier(0.4,0,0.6,1), opacity 0.1s ease 0.05s`;
+  ghost.style.transform  = `rotateY(${fanRot}deg) scale(1.0)`;
+  await d(80);
+  ghost.style.opacity = '0';
+  await d(90);
+  if(cardIndex !== undefined) _dealAnimating.delete(cardIndex);
+  ghostWrap.remove();
+  // Reveal the card by index in the LIVE DOM (destEl may be stale)
+  const liveHcEls = document.querySelectorAll('#hand-container .hc');
+  const targetHcEl = (cardIndex !== undefined && liveHcEls[cardIndex]) ? liveHcEls[cardIndex] : null;
+  if(targetHcEl) { targetHcEl.style.visibility = ''; targetHcEl.style.pointerEvents = ''; }
+  else liveHcEls.forEach(el => { if(el.style.visibility === 'hidden') { el.style.visibility = ''; el.style.pointerEvents = ''; } });
 }
 
 // ── COORDINATE FIX FOR PORTRAIT MODE ─────────────────────────
@@ -3772,6 +4136,25 @@ function fusionsByDex(dexNums) {
   });
 }
 
+// Helper: build a 52-card deck from weighted pool
+function buildDeckOf(coreDexNums, fillDexNums, target) {
+  target = target || 30;
+  const core = fusionsByDex(coreDexNums);
+  // If core is empty fall back to random FUSIONS
+  const corePool = core.length ? core : FUSIONS.slice(0,20);
+  const fillPool = (fillDexNums && fillDexNums.length) ? fusionsByDex(fillDexNums) : corePool;
+  const pool = [...corePool];
+  fillPool.forEach(f=>{ if(f && !pool.find(p=>p.name===f.name)) pool.push(f); });
+  // Pad with repeats of core cards (shuffle names slightly each copy)
+  let i=0;
+  while(pool.length < target) {
+    const base = corePool[i % corePool.length];
+    if(base) pool.push({...base});
+    i++;
+  }
+  return shuffle(pool.slice(0, target)).map(f=>mkCard(f));
+}
+
 const STARTER_DECKS = [
   {
     id:'species', name:'SPECIES MASTERY', emoji:'⚡', accent:'#ffdd00',
@@ -3779,11 +4162,7 @@ const STARTER_DECKS = [
     ability:'Species hands scale massively',
     weakness:'Vulnerable if bosses punish one species',
     handFocus:'Species Pair / Trio / Army',
-    buildDeck:()=>{
-      const p=[...fusionsByDex([25,26,172]).slice(0,5),...fusionsByDex([19,20]).slice(0,3),...fusionsByDex([16,17,18]).slice(0,3),...fusionsByDex([13,14]).slice(0,2),...fusionsByDex([43,44]).slice(0,2)];
-      while(p.length<15) p.push(FUSIONS[p.length%FUSIONS.length]);
-      return p.slice(0,15).map(f=>mkCard(f));
-    }
+    buildDeck:()=>buildDeckOf([25,26,172, 19,20, 16,17,18], [13,14,15, 43,44,45, 23,24], 30)
   },
   {
     id:'type', name:'TYPE SPECIALIST', emoji:'🔥', accent:'#ff4422',
@@ -3791,11 +4170,7 @@ const STARTER_DECKS = [
     ability:'Consistent type-hand scoring',
     weakness:'Harder to make rare hands',
     handFocus:'Type Team / Dual Type Team',
-    buildDeck:()=>{
-      const p=[...fusionsByDex([4,5,6,37,38,58,59,126,136]).slice(0,8),...fusionsByDex([21,22]).slice(0,3),...fusionsByDex([23,24]).slice(0,2),...fusionsByDex([19,20]).slice(0,2)];
-      while(p.length<15) p.push(fusionsByDex([4,5,6,37,38,58,59])[p.length%7]||FUSIONS[0]);
-      return p.filter(Boolean).slice(0,15).map(f=>mkCard(f));
-    }
+    buildDeck:()=>buildDeckOf([4,5,6, 37,38, 58,59, 126, 136], [21,22, 23,24, 19,20], 30)
   },
   {
     id:'evolution', name:'EVOLUTION DECK', emoji:'🌿', accent:'#44bb44',
@@ -3803,11 +4178,7 @@ const STARTER_DECKS = [
     ability:'Evolution upgrades scale stronger',
     weakness:'Slow early game',
     handFocus:'Evolution Line / Evolution Family',
-    buildDeck:()=>{
-      const p=[...fusionsByDex([1,2,3]).slice(0,3),...fusionsByDex([4,5,6]).slice(0,3),...fusionsByDex([7,8,9]).slice(0,3),...fusionsByDex([16,17,18]).slice(0,2),...fusionsByDex([19,20]).slice(0,2),...fusionsByDex([39,40]).slice(0,2)];
-      while(p.length<15) p.push(FUSIONS[p.length%FUSIONS.length]);
-      return p.slice(0,15).map(f=>mkCard(f));
-    }
+    buildDeck:()=>buildDeckOf([1,2,3, 4,5,6, 7,8,9], [16,17,18, 19,20, 39,40, 60,61,62], 30)
   },
   {
     id:'network', name:'FUSION NETWORK', emoji:'🔗', accent:'#44aaff',
@@ -3815,11 +4186,7 @@ const STARTER_DECKS = [
     ability:'Cards score for linking together',
     weakness:'Needs specific combinations',
     handFocus:'Connection Chain / Fusion Network',
-    buildDeck:()=>{
-      const p=[...fusionsByDex([6,9,3,94,25,131,149,143]).slice(0,10),...fusionsByDex([55,65,68,112]).slice(0,5)];
-      while(p.length<15) p.push(FUSIONS[p.length%FUSIONS.length]);
-      return p.slice(0,15).map(f=>mkCard(f));
-    }
+    buildDeck:()=>buildDeckOf([6,9,3,94,25,131,149,143], [55,65,68,112,54,80,131,117], 30)
   },
   {
     id:'mutation', name:'MUTATION DECK', emoji:'🌀', accent:'#cc44ff',
@@ -3827,14 +4194,7 @@ const STARTER_DECKS = [
     ability:'The stranger the combo, the stronger',
     weakness:'Cannot chase predictable hands',
     handFocus:'Mutation / Rainbow Team',
-    buildDeck:()=>{
-      const weird=[...fusionsByDex([129,130,151,132,94,143,65,46,47,54,88,89]).slice(0,10)];
-      const seen=new Set(weird.map(f=>f.name));
-      const rand=[...FUSIONS].sort(()=>Math.random()-0.5).filter(f=>!seen.has(f.name)).slice(0,8);
-      const p=[...weird,...rand];
-      while(p.length<15) p.push(FUSIONS[p.length%FUSIONS.length]);
-      return p.slice(0,15).map(f=>mkCard(f));
-    }
+    buildDeck:()=>buildDeckOf([129,130,151,132,94,143,65,46,47,54,88,89,35,39,52,74,81,116,147], [], 30)
   },
 ];
 
@@ -3847,6 +4207,9 @@ function initStarterDeckScreen() {
   screen.classList.remove('hidden','exiting');
   document.getElementById('starter-main-title').textContent = 'RIFTBORN';
   document.getElementById('starter-sub').textContent = 'CHOOSE YOUR STARTER DECK';
+  // Hide confirm until deck selected
+  const cb=document.getElementById('starter-confirm-btn');
+  if(cb) cb.classList.remove('ready');
   // Particles
   let particles = document.getElementById('starter-particles');
   if(!particles){particles=document.createElement('div');particles.id='starter-particles';document.body.appendChild(particles);}
@@ -3855,49 +4218,106 @@ function initStarterDeckScreen() {
   const arc=document.getElementById('starter-arc-wrap');
   if(!arc) return;
   arc.innerHTML='';
-  const conf=document.getElementById('starter-confirm');
-  const cb=document.getElementById('starter-confirm-btn');
-  if(cb) cb.classList.remove('ready');
   STARTER_DECKS.forEach((deck,i)=>{
-    const card=document.createElement('div');
-    card.className='deck-choice-card';
-    card.style.setProperty('--dd','0.5s');
-    card.style.setProperty('--dl',(0.06+i*0.1)+'s');
-    card.style.setProperty('--accent',deck.accent);
-    card.innerHTML=`<div class="dcc-emoji">${deck.emoji}</div><div class="dcc-name">${deck.name}</div><div class="dcc-subtitle">${deck.subtitle}</div><div class="dcc-divider"></div><div class="dcc-stat"><span class="dcc-stat-label">FOCUS</span><span class="dcc-stat-val">${deck.handFocus}</span></div><div class="dcc-stat"><span class="dcc-stat-label">BONUS</span><span class="dcc-stat-val green">${deck.ability}</span></div><div class="dcc-stat"><span class="dcc-stat-label">RISK</span><span class="dcc-stat-val red">${deck.weakness}</span></div>`;
-    card.addEventListener('click',()=>selectStarterDeck(deck.id,card));
-    arc.appendChild(card);
+    // Build a pile element
+    const pile=document.createElement('div');
+    pile.className='deck-pile-chooser';
+    pile.style.animationDelay=(i*0.08)+'s';
+    // Stack container
+    const stack=document.createElement('div');
+    stack.className='dpc-stack';
+    // All cards face-up with slightly different fusions, random rotation/offset
+    const rng=(s)=>{ let x=Math.sin(s*9301+49297)*233280; return x-Math.floor(x); };
+    const deckFusions = deck.buildDeck().slice(0,4);
+    for(let b=3;b>=0;b--){
+      const bc=document.createElement('div');
+      bc.className='dpc-card';
+      const ang=(rng(i*10+b)-0.5)*12;
+      const ox=(rng(i*10+b+1)-0.5)*12;
+      const oy=(rng(i*10+b+2)-0.5)*10;
+      bc.style.transform=`rotate(${ang}deg) translate(${ox}px,${oy}px)`;
+      bc.style.zIndex=b;
+      bc.style.filter = b===3 ? 'none' : `brightness(${0.55+b*0.12})`;
+      const bImg=document.createElement('img');
+      bImg.draggable=false;
+      const bFusion = deckFusions[b] || deckFusions[0];
+      removeWhiteBg(bFusion.fusionImg||bFusion.img, url=>{ bImg.src=url; });
+      bc.appendChild(bImg);
+      stack.appendChild(bc);
+    }
+    pile.appendChild(stack);
+    // Label — wrap at first space
+    const label=document.createElement('div');
+    label.className='dpc-label';
+    const words=deck.name.split(' ');
+    if(words.length>=2){label.innerHTML=words[0]+'<br>'+words.slice(1).join(' ');}
+    else{label.textContent=deck.name;}
+    pile.appendChild(label);
+    pile.addEventListener('click',()=>openDeckDetail(deck.id, pile));
+    arc.appendChild(pile);
   });
   // Hide game UI
-  ['hand-container','game-hud','deck-ours','end-turn-btn','balatro-bottom','run-panel','hd-row','owned-items-panel'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['hand-container','game-hud','deck-ours','end-turn-btn','balatro-bottom','run-panel','hd-row','owned-items-panel','hands-panel'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
 }
 
-function selectStarterDeck(deckId,el){
-  G_starterDeckId=deckId;
-  if(_selectedDeckEl) _selectedDeckEl.classList.remove('dcc-selected');
-  el.classList.add('dcc-selected'); _selectedDeckEl=el;
-  const confirmBtn=document.getElementById('starter-confirm-btn');
-  if(confirmBtn) confirmBtn.classList.add('ready');
-
-  // Burst particles
-  const rect=el.getBoundingClientRect();
-  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
-  for(let i=0;i<16;i++){const p=document.createElement('div');p.className='burst-particle';const angle=Math.random()*Math.PI*2,dist=50+Math.random()*90;const cols=['#ffdd66','#ff9933','#ff5577','#aa66ff','#44ccff','#88ff88'];p.style.cssText=[`left:${cx}px`,`top:${cy}px`,`background:${cols[i%cols.length]}`,`width:${3+Math.random()*5}px`,`height:${3+Math.random()*5}px`,`--tx:${Math.cos(angle)*dist}px`,`--ty:${Math.sin(angle)*dist}px`,`--dur:${0.5+Math.random()*0.4}s`].join(';');document.body.appendChild(p);setTimeout(()=>p.remove(),1000);}
+function openDeckDetail(deckId, pileEl) {
+  G_starterDeckId = deckId;
+  const deck = STARTER_DECKS.find(d=>d.id===deckId);
+  if(!deck) return;
+  // Burst particles on pile
+  const rect = pileEl.getBoundingClientRect();
+  const cx = rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  for(let i=0;i<14;i++){const p=document.createElement('div');p.className='burst-particle';const angle=Math.random()*Math.PI*2,dist=40+Math.random()*70;const cols=['#ffdd66','#ff9933','#ff5577','#aa66ff','#44ccff','#88ff88'];p.style.cssText=[`left:${cx}px`,`top:${cy}px`,`background:${cols[i%cols.length]}`,`width:${3+Math.random()*4}px`,`height:${3+Math.random()*4}px`,`--tx:${Math.cos(angle)*dist}px`,`--ty:${Math.sin(angle)*dist}px`,`--dur:${0.4+Math.random()*0.3}s`].join(';');document.body.appendChild(p);setTimeout(()=>p.remove(),800);}
+  // Build detail screen
+  const dds = document.getElementById('deck-detail-screen');
+  if(!dds) return;
+  // Hide the pile chooser screen behind
+  const starterScr = document.getElementById('starter-screen');
+  if(starterScr) starterScr.style.visibility = 'hidden';
+  document.getElementById('dds-deck-name').textContent = deck.name;
+  document.getElementById('dds-subtitle').textContent = deck.subtitle;
+  document.getElementById('dds-focus').textContent = deck.handFocus;
+  document.getElementById('dds-bonus').textContent = deck.ability;
+  document.getElementById('dds-risk').textContent  = deck.weakness;
+  // Render deck cards
+  const cardsWrap = document.getElementById('dds-cards');
+  cardsWrap.innerHTML = '';
+  const cards = deck.buildDeck();
+  cards.forEach((card, i) => {
+    const slot = document.createElement('div');
+    slot.className='dds-card-slot';
+    slot.style.setProperty('--sd', (i*0.03)+'s');
+    const cv = makeCardVisual(card, 'width:100%;height:100%;');
+    cv.style.cursor='default';
+    slot.appendChild(cv);
+    cardsWrap.appendChild(slot);
+  });
+  dds.classList.add('open');
 }
+
+function closeDeckDetail() {
+  document.getElementById('deck-detail-screen')?.classList.remove('open');
+  G_starterDeckId = null;
+  // Restore pile chooser
+  const starterScr = document.getElementById('starter-screen');
+  if(starterScr) starterScr.style.visibility = 'visible';
+}
+
+function selectStarterDeck(deckId,el){ G_starterDeckId=deckId; }
 
 function confirmStarterDeck(){
   if(!G_starterDeckId) return;
+  // Close detail screen
+  document.getElementById('deck-detail-screen')?.classList.remove('open');
   const screen=document.getElementById('starter-screen');
   const particles=document.getElementById('starter-particles');
-  const conf=document.getElementById('starter-confirm');
-  if(conf) conf.classList.remove('show');
   if(screen) screen.classList.add('exiting');
   if(particles){particles.style.transition='opacity 0.4s';particles.style.opacity='0';}
   setTimeout(()=>{
     if(screen) screen.classList.add('hidden');
     if(particles) particles.remove();
     beginBattleWithDeck(G_starterDeckId);
-  },850);
+  },700);
 }
 
 function beginBattleWithDeck(deckId){
@@ -3928,10 +4348,7 @@ function beginBattleWithDeck(deckId){
     <div id="starter-sub">CHOOSE YOUR STARTER DECK</div>
   </div>
   <div id="starter-arc-wrap"></div>
-  <div id="starter-confirm">
-    <div id="starter-confirm-name">DECK</div>
-    <button id="starter-confirm-btn" onclick="confirmStarterDeck()">BEGIN YOUR JOURNEY!</button>
-  </div>
+  <!-- confirm button only shown from deck detail screen -->
 </div>
 
 <div id="starter-particles"></div>
@@ -4245,7 +4662,7 @@ const SHOP_ITEMS = [
   { id:'great_ball',   name:"Great Ball",   emoji:'🔵', cost:3, category:'Universal', desc:'+1 hand size: draw 9 cards instead of 8.' },
   { id:'leftovers',    name:"Leftovers",    emoji:'🍃', cost:3, category:'Universal', desc:'Gain +30 chips at the start of every round.' },
   { id:'choice_scarf', name:"Choice Scarf", emoji:'🧣', cost:4, category:'Universal', desc:'First played card this round is retriggered.' },
-  { id:'focus_sash',   name:"Focus Sash",   emoji:'🛡', cost:4, category:'Universal', desc:'Survive one losing round: recover once per run.' },
+  { id:'focus_sash',   name:"Focus Sash",   emoji:'🔰', cost:4, category:'Universal', desc:'Survive one losing round: recover once per run.' },
   { id:'life_orb',     name:"Life Orb",     emoji:'🔮', cost:5, category:'Universal', desc:'+100 Mult but lose $1 every round.' },
   // ── Legendary ──
   { id:'mew_dna',      name:"Mew's DNA",    emoji:'💜', cost:8, category:'Legendary', desc:'All Pokémon count as connected to each other.' },
@@ -4377,11 +4794,11 @@ function startNextBattle() {
   <div id="route-pick-label">Pick 1 Pokémon to add to your deck</div>
   <div id="route-pokemon-row"></div>
   <div id="route-btn-row">
-    <button id="route-confirm-btn" onclick="confirmRoutePick()">ADD TO DECK ✓</button>
     <div id="route-secondary-row">
       <button id="route-view-deck-btn" onclick="openDeckViewer()">VIEW DECK</button>
       <button class="between-skip" onclick="skipRoute()">SKIP →</button>
     </div>
+    <button id="route-confirm-btn" onclick="confirmRoutePick()">ADD TO DECK ✓</button>
   </div>
 </div>
 
@@ -4426,6 +4843,35 @@ function startNextBattle() {
     <button id="dv-close" onclick="closeDeckViewer()">✕ CLOSE</button>
   </div>
   <div id="dv-grid"></div>
+</div>
+
+
+<!-- ── DECK DETAIL SCREEN ── -->
+<div id="deck-detail-screen">
+  <div id="dds-header">
+    <button id="dds-back-btn" onclick="closeDeckDetail()">← BACK</button>
+    <div id="dds-deck-name">DECK</div>
+    <button id="dds-begin-btn" onclick="confirmStarterDeck()">BEGIN YOUR JOURNEY!</button>
+  </div>
+  <div id="dds-body">
+    <div id="dds-info">
+      <div id="dds-subtitle" style="font-size:clamp(9px,0.95vw,13px);color:#667788;line-height:1.6;"></div>
+      <div class="dds-info-div"></div>
+      <div class="dds-info-stat">
+        <span class="dds-info-label">Hand Focus</span>
+        <span class="dds-info-val" id="dds-focus"></span>
+      </div>
+      <div class="dds-info-stat">
+        <span class="dds-info-label">Bonus</span>
+        <span class="dds-info-val green" id="dds-bonus"></span>
+      </div>
+      <div class="dds-info-stat">
+        <span class="dds-info-label">Risk</span>
+        <span class="dds-info-val red" id="dds-risk"></span>
+      </div>
+    </div>
+    <div id="dds-cards"></div>
+  </div>
 </div>
 
 </body>
