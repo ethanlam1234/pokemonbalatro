@@ -34,9 +34,9 @@ body {
   will-change:transform;
 }
 .pc .pc-art {
-  height:100%; width:auto; display:block;
+  height:82%; width:auto; display:block;
   object-fit:contain; object-position:center center; image-rendering:pixelated;
-  background:transparent; position:absolute; top:0; bottom:0; left:50%;
+  background:transparent; position:absolute; top:5%; bottom:13%; left:50%;
   transform:translateX(-50%); z-index:1;
 }
 .pc .pc-name { display:none; }
@@ -162,11 +162,11 @@ body {
 
 /* ── HAND CARD 3D FLOAT ANIMATION ── */
 @keyframes hcFloat {
-  0%   { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(0px)  rotateX(0deg)    scale(1.000); }
-  30%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(-2px) rotateX(1.2deg)  scale(1.005); }
-  60%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(-3px) rotateX(1.8deg)  scale(1.008); }
-  80%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(-1px) rotateX(0.8deg)  scale(1.003); }
-  100% { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(0px)  rotateX(0deg)    scale(1.000); }
+  0%   { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px)))        rotateX(0deg)    scale(1.000); }
+  30%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px) - 2px)) rotateX(1.2deg)  scale(1.005); }
+  60%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px) - 3px)) rotateX(1.8deg)  scale(1.008); }
+  80%  { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px) - 1px)) rotateX(0.8deg)  scale(1.003); }
+  100% { transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px)))        rotateX(0deg)    scale(1.000); }
 }
 .hc.hc-floating {
   animation: hcFloat var(--float-dur, 3.2s) var(--float-delay, 0s) ease-in-out infinite;
@@ -202,16 +202,16 @@ body {
   width:clamp(110px,9.2vw,148px); flex:0 0 auto; margin:0 -12px;
   aspect-ratio:2/3; position:relative;
   cursor:pointer; pointer-events:all;
-  transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px));
+  transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(var(--dy,0px));
   transform-origin: 50% 110%;
   transition:transform 0.18s ease, box-shadow 0.18s, z-index 0s, margin-left 320ms cubic-bezier(0.4,0,0.15,1);
   border-radius:8px; overflow:hidden;
-  background:#0a0a18;
+  background:#ffffff;
   border:2px solid transparent; box-shadow:0 4px 14px rgba(0,0,0,0.8);
   user-select:none;
 }
 .hc:hover {
-  transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(-6px) scale(1.03) rotateX(var(--tilt3d-rx,0deg)) rotateY(var(--tilt3d-ry,0deg)) !important;
+  transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px) - 6px)) scale(1.03) rotateX(var(--tilt3d-rx,0deg)) rotateY(var(--tilt3d-ry,0deg)) !important;
   z-index:20 !important; box-shadow:0 10px 22px rgba(0,0,0,0.9);
   transition:transform 0.08s ease, box-shadow 0.1s !important;
 }
@@ -224,7 +224,7 @@ body {
   border-color:rgba(255,220,60,0.7);
   box-shadow:0 0 0 1px rgba(255,210,0,0.4), 0 0 10px rgba(255,200,0,0.25);
 }
-.hc.selected-hand { transform:rotate(var(--tilt,0deg)) translateY(-28px) scale(1.05) !important; z-index:15 !important; transition:transform 0.2s ease !important; }
+.hc.selected-hand { --sel-ty:-22px; z-index:15 !important; }
 /* ── ALWAYS-VISIBLE OPP HERO POWER CARD ── */
 .opp-hp-card {
   margin-top:6px;
@@ -432,12 +432,12 @@ body {
   align-items:center;
   max-width:min(95vw,1000px);
   margin-top:clamp(20px,3vh,40px);
-  padding:clamp(20px,3vh,40px) 0;
+  padding:clamp(24px,3.5vh,44px) 0;
   overflow:visible;
 }
 .route-poke-card {
   width:clamp(110px,11vw,155px); aspect-ratio:2/3;
-  background:rgba(8,10,26,0.95); border:2px solid rgba(50,70,140,0.5);
+  background:#ffffff; border:2px solid rgba(50,70,140,0.5);
   border-radius:10px; overflow:hidden; cursor:pointer; position:relative;
   transition:transform 0.18s ease, border-color 0.18s, box-shadow 0.18s;
   box-shadow:0 4px 16px rgba(0,0,0,0.7);
@@ -450,14 +450,14 @@ body {
 }
 .route-poke-card.selected {
   border-color:#00ddff; box-shadow:0 0 0 2px #00ddff,0 0 20px rgba(0,200,255,0.5);
-  transform: scale(1.12);
-  transform-origin: 50% 20%;
+  transform: scale(1.12) translateY(8px);
+  transform-origin: 50% 50%;
   z-index: 10;
 }
 .route-poke-card.taken { opacity:0.35; pointer-events:none; filter:saturate(0.2); }
 .route-poke-card .rpc-img {
-  width:100%; height:80%; object-fit:contain; image-rendering:pixelated;
-  background:transparent; display:block; padding:8px;
+  width:86%; height:72%; object-fit:contain; image-rendering:pixelated;
+  background:transparent; display:block; padding:0; margin:8% auto 0;
 }
 .route-poke-card .rpc-types {
   position:absolute; bottom:4px; left:4px; right:4px;
@@ -565,7 +565,7 @@ body {
 .dpc-card {
   position:absolute; inset:0;
   border-radius:8px; overflow:hidden;
-  background:#0a0a18;
+  background:#ffffff;
   border:2px solid #2a3a6a;
   box-shadow:0 4px 16px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(80,110,200,0.2);
   transition:box-shadow 0.2s, transform 0.08s ease;
@@ -573,19 +573,26 @@ body {
 }
 /* 3D tilt on hover (via JS --tilt3d vars) */
 .dpc-top:hover {
-  transform: rotateX(var(--tilt3d-rx,0deg)) rotateY(var(--tilt3d-ry,0deg)) translateY(-6px) scale(1.04);
-  box-shadow:0 12px 28px rgba(0,0,0,0.95);
+  transform: rotateX(var(--tilt3d-rx,0deg)) rotateY(var(--tilt3d-ry,0deg)) translateY(-10px) scale(1.06);
+  box-shadow:0 14px 32px rgba(0,0,0,0.95);
   animation: none !important;
 }
-/* Float animation on the top card */
-.dpc-top {
-  animation: hcFloat var(--float-dur,3.2s) var(--float-delay,0s) ease-in-out infinite;
+/* Float animation on the top card — slightly more pronounced than hand cards */
+@keyframes dpcFloat {
+  0%   { transform: translateY(0px)   rotateX(0deg)   scale(1.00); }
+  30%  { transform: translateY(-5px)  rotateX(2.5deg) scale(1.02); }
+  60%  { transform: translateY(-8px)  rotateX(4deg)   scale(1.03); }
+  80%  { transform: translateY(-4px)  rotateX(2deg)   scale(1.015); }
+  100% { transform: translateY(0px)   rotateX(0deg)   scale(1.00); }
 }
-.dpc-top:hover { animation:none; }
+.dpc-top {
+  animation: dpcFloat var(--float-dur,3.2s) var(--float-delay,0s) ease-in-out infinite;
+}
+.dpc-top:hover { animation:none !important; }
 .dpc-card img {
-  position:absolute; top:0; bottom:0; left:50%;
+  position:absolute; top:5%; bottom:8%; left:50%;
   transform:translateX(-50%);
-  height:100%; width:auto;
+  height:87%; width:auto;
   object-fit:contain; image-rendering:pixelated;
 }
 /* Back cards (ghost cards behind top) */
@@ -725,15 +732,15 @@ body {
 .card-visual {
   flex:0 0 auto; position:relative; cursor:pointer;
   border-radius:8px; overflow:hidden;
-  background:#0a0a18; border:2px solid rgba(60,80,120,0.35);
+  background:#ffffff; border:2px solid rgba(60,80,120,0.35);
   box-shadow:0 2px 8px rgba(0,0,0,0.5);
   transition:transform 0.18s ease, border-color 0.18s, box-shadow 0.18s;
   user-select:none;
 }
 .card-visual img.cv-art {
-  position:absolute; top:0; bottom:0; left:50%;
+  position:absolute; top:6%; bottom:10%; left:50%;
   transform:translateX(-50%);
-  height:100%; width:auto;
+  height:84%; width:auto;
   object-fit:contain; image-rendering:pixelated;
   background:transparent; display:block; z-index:1;
 }
@@ -851,9 +858,9 @@ body {
 .hc.unaffordable { filter:brightness(0.45) saturate(0.3); }
 .hc .hc-cost { display:none !important; }
 .hc .hc-art {
-  position:absolute; top:0; bottom:0; left:50%;
+  position:absolute; top:6%; bottom:10%; left:50%;
   transform:translateX(-50%);
-  height:100%; width:auto;
+  height:84%; width:auto;
   object-fit:contain; image-rendering:pixelated;
   background:transparent; padding:0; display:block; z-index:1;
 }
@@ -1101,7 +1108,7 @@ body {
 #starter-screen {
   position:fixed; inset:0; z-index:2000;
   display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:clamp(24px,4vh,48px); overflow-y:auto;
+  justify-content:center; gap:clamp(32px,5vh,60px); overflow-y:auto;
   font-family:'PokemonClassic',monospace; background:transparent;
   padding:clamp(20px,3vh,40px) 0;
 }
@@ -1240,16 +1247,26 @@ body {
   /* ── Left panel ── */
   #run-panel  { width:clamp(110px,20vw,150px) !important; gap:4px !important; left:6px !important; top:6px !important; }
   #rp-hand-preview { display:none !important; }
-  #rp-portrait-img-wrap { width:50% !important; aspect-ratio:1/1 !important; }
+  #rp-portrait { flex-direction:row !important; align-items:center !important; gap:6px !important; }
+  #rp-portrait-img-wrap { width:36px !important; height:36px !important; aspect-ratio:1/1 !important; flex-shrink:0 !important; border-radius:4px !important; }
+  #rp-portrait-img-wrap img { transform:scale(2.4) !important; transform-origin:center 40% !important; }
+  #rp-portrait-overlay { flex:1 !important; padding:4px 6px !important; }
+  #rp-hp-bar-wrap { height:3px !important; }
   /* Route buttons: horizontal on mobile */
   #route-btn-row {
     width:min(95vw,680px) !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+    margin-top:8px !important;
   }
+  #route-btn-row #route-confirm-btn { margin-top:0 !important; }
   #route-secondary-row {
-    width:100% !important; justify-content:space-between !important;
+    display:contents !important;
   }
-  #rp-trainer-name  { font-size:9px !important; }
-  #rp-trainer-hp    { font-size:8px !important; }
+  #rp-trainer-name  { font-size:8px !important; }
+  #rp-trainer-hp    { font-size:7px !important; }
   #rp-hero-power    { padding:6px 8px !important; }
   .rp-hp-name       { font-size:8px !important; }
   .rp-hp-desc       { font-size:7px !important; }
@@ -2179,6 +2196,7 @@ function makeHcEl(card, i, isHidden) {
   const tilt = getTilt(card.id || (card.name + i));
   el.style.setProperty('--tilt', tilt + 'deg');
   el.style.setProperty('--dx', '0px');
+  el.style.setProperty('--dy', '0px');
   if(G_selected.has(i)) el.classList.add('selected-hand');
   if(isHidden) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none'; }
   const art = document.createElement('img');
@@ -2326,171 +2344,246 @@ async function discardSelected() {
   const flyWait = Math.round((FLY_DUR + selectedIndices.length*STAGGER)*1000) + 60;
   await delay(flyWait);
 
-  // Phase 2: animate gap close — G.hand is STILL intact (no re-render will fire)
-  // Only after the animation do we mutate G.hand and draw new cards
+  // animateHandReflow handles: collapse → draw new cards → sort → slide all to positions
   await animateHandReflow(selectedIndices, () => {
-    const toRemove = Array.from(G_selected).sort((a,b) => b-a);
-    toRemove.forEach(i => { if(G.hand[i]) G.hand.splice(i,1); });
-    G_selected.clear();
-    _activeHandType = null;
     G.animating = false;
     renderHandsPanel();
-    autoFillHand(() => {
-      renderHandWithNewCards();
-      updateRunPanel();
-    });
+    updateRunPanel();
   });
 }
 
-// ── HAND GAP CLOSE → DRAW ────────────────────────────────────────
-// Uses rAF loop to animate margin-left directly on alive cards.
-// flex-basis:auto is not CSS-transitionable; JS animation is the only way.
+// ═══════════════════════════════════════════════════════════════
+// BALATRO-STYLE FAN DRAW ANIMATION
+//
+// Each card has a computed fan position based on its index and total count.
+// When a card is added: all cards animate to new N+1 fan positions,
+// new card ghost flies from deck and lands at its fan slot.
+// This creates the "hand spreads to accommodate new card" Balatro look.
+// ═══════════════════════════════════════════════════════════════
+
+// ── CARD SORTING HELPER ─────────────────────────────────────────
+function sortKey(card) {
+  if(G_sort_mode === 'type') return (card.type1||'zzz') + (card.type2||'zzz') + (card.name||'');
+  return String(parseInt(card.dexA)||999).padStart(4,'0') + (card.name||'');
+}
+
+// Measure screen positions of N .hc slots in the centred flex hand
+function measureSlots(n) {
+  const hc = document.getElementById('hand-container');
+  if(!hc || n<=0) return [];
+  const tmp=[];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='hc';
+    d.style.cssText='visibility:hidden;pointer-events:none;flex-shrink:0;';
+    d.style.setProperty('--tilt','0deg'); d.style.setProperty('--dx','0px');
+    hc.appendChild(d); tmp.push(d);
+  }
+  void hc.getBoundingClientRect();
+  const pos=tmp.map(d=>{const r=d.getBoundingClientRect();return{cx:r.left+r.width/2,cy:r.top+r.height/2};});
+  tmp.forEach(d=>d.remove());
+  return pos;
+}
+
+// Slide elements from their current screen positions to new positions via --dx rAF
+async function slideElsToPositions(els, targets, dur) {
+  if(!els.length) return;
+  const hc = document.getElementById('hand-container');
+  // Snapshot where each element is NOW
+  const fromCx = els.map(el=>{const r=el.getBoundingClientRect();return r.left+r.width/2;});
+  // Set --dx so they appear at their CURRENT position
+  els.forEach((el,i)=>{
+    const tx = targets[i]?.cx ?? fromCx[i];
+    el.style.setProperty('--dx',(fromCx[i]-tx)+'px');
+  });
+  void hc?.getBoundingClientRect();
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  // Animate --dx to 0
+  const t0=performance.now();
+  const dx0=els.map(el=>parseFloat(el.style.getPropertyValue('--dx')||'0'));
+  const ease=t=>t<0.5?2*t*t:-1+(4-2*t)*t;
+  await new Promise(resolve=>{
+    function frame(now){
+      const t=Math.min(1,(now-t0)/dur),e=ease(t);
+      els.forEach((el,i)=>el.style.setProperty('--dx',(dx0[i]*(1-e))+'px'));
+      if(t<1)requestAnimationFrame(frame);
+      else{els.forEach(el=>el.style.setProperty('--dx','0px'));resolve();}
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+// ── MAIN SEQUENCE: after discard/play ───────────────────────────
+// 1. Collapse removed cards
+// 2. Compute NEW full sorted hand (existing alive + cards from deck)
+// 3. Measure where all 8 cards will sit
+// 4. Existing cards slide to their new sorted positions
+// 5. New cards fly ghost arcs from deck to their sorted positions
+// All motions happen simultaneously → smooth Balatro-style refill
 async function animateHandReflow(deadIndices, callback) {
-  const CLOSE_DUR  = 320;  // ms
-  const DRAW_DELAY = 110;  // ms pause before draw
-
-  const hcContainer = document.getElementById('hand-container');
-  if(!hcContainer) { if(callback) callback(); return; }
-
-  const allEls = [...hcContainer.querySelectorAll('.hc')];
-  if(!allEls.length) { if(callback) callback(); return; }
-
-  const deadSet = new Set(deadIndices);
-  const deadEls  = allEls.filter((_,i) => deadSet.has(i));
-  const aliveEls = allEls.filter((_,i) => !deadSet.has(i));
-  if(!deadEls.length) { if(callback) callback(); return; }
+  const hc = document.getElementById('hand-container');
+  if(!hc){if(callback)callback();return;}
 
   window._reflowAnimating = true;
 
-  // STEP 1: snapshot where every alive card currently is on screen
-  const oldPositions = new Map();
-  aliveEls.forEach(el => {
-    oldPositions.set(el, el.getBoundingClientRect().left);
+  const allEls = [...hc.querySelectorAll('.hc')];
+  const deadSet = new Set(deadIndices);
+  const deadEls  = allEls.filter((_,i)=>deadSet.has(i));
+  const aliveEls = allEls.filter((_,i)=>!deadSet.has(i));
+
+  // ── Step 1: collapse dead cards instantly ──────────────────────
+  deadEls.forEach(el=>{
+    el.style.cssText += ';width:0;min-width:0;margin:0;padding:0;overflow:hidden;opacity:0;transition:none;';
+  });
+  void hc.getBoundingClientRect();
+
+  // ── Step 2: figure out the full new hand after draw ────────────
+  // Remove dead cards from G.hand
+  const toRemove = deadIndices.slice().sort((a,b)=>b-a);
+  toRemove.forEach(i=>{if(G.hand[i])G.hand.splice(i,1);});
+  G_selected.clear(); _activeHandType=null;
+
+  // Draw new cards into G.hand
+  const toDraw = Math.min(8-G.hand.length, G.deck.length);
+  const newCards = [];
+  for(let i=0;i<toDraw;i++){
+    if(!G.deck.length||G.hand.length>=8)break;
+    const c={...G.deck.shift()};
+    G.hand.push(c);
+    newCards.push(c);
+  }
+
+  // Sort the full new hand
+  G.hand.sort((a,b)=>sortKey(a).localeCompare(sortKey(b)));
+
+  // ── Step 3: measure where all 8 cards will sit ─────────────────
+  const slots = measureSlots(G.hand.length); // positions for every card
+  // slots[i] = where G.hand[i] should appear on screen
+
+  // ── Step 4: match each alive DOM element to its new G.hand index ─
+  // aliveEls[j] was G.hand[aliveOriginalIndices[j]] — now we need to
+  // find where that card ended up in the sorted hand.
+  // We'll match by card object reference.
+  // Build a map: card → new sorted index
+  const cardToNewIdx = new Map(G.hand.map((c,i)=>[c,i]));
+
+  // For each alive el, find its card's new position
+  // aliveEls are the survivors (after dead removed), in original DOM order
+  // Their cards are the alive portion of the pre-splice G.hand
+  // We need to know which card each aliveEl represents.
+  // Since we already spliced G.hand, we can't look them up by index anymore.
+  // So we stored the card reference on the element — or we need another way.
+  // Solution: before splicing, we tagged alive els in discardSelected.
+  // Actually aliveEls were captured BEFORE splice. The alive cards are
+  // G.hand AFTER splice but BEFORE newCards were added, in their original order.
+  // After sort, we need to find each alive card's new index.
+  // We'll use the data stored in the DOM: each .hc has an img src we can match,
+  // or better: we store card ref on element.
+  // Simplest: rebuild all DOM elements from sorted G.hand in one go.
+  // But we need to animate FROM current positions TO new positions.
+
+  // Approach: renderHand(false) gives us clean sorted elements at final positions.
+  // FLIP: snapshot current positions, render, compute deltas, animate.
+
+  // Snapshot alive card positions NOW (before DOM rebuild)
+  const aliveCxs = aliveEls.map(el=>{const r=el.getBoundingClientRect();return r.left+r.width/2;});
+  // Map each alive card to a cx by matching card objects
+  // We use the art src as a proxy for card identity
+  const artSrcToCx = new Map();
+  aliveEls.forEach((el,j)=>{
+    const src = el.querySelector('.hc-art')?.src||'';
+    if(src) artSrcToCx.set(src, aliveCxs[j]);
   });
 
-  // STEP 2: collapse dead cards to zero width instantly (no transition)
-  // Use inline display:none equivalent: width=0, overflow=hidden, margin=0
-  deadEls.forEach(el => {
-    el.style.transition = 'none';
-    el.style.width = '0px';
-    el.style.minWidth = '0px';
-    el.style.margin = '0px';
-    el.style.padding = '0px';
-    el.style.overflow = 'hidden';
-    el.style.opacity = '0';
-    el.style.flexShrink = '0';
-    el.style.flexGrow = '0';
+  // ── Step 5: rebuild DOM in sorted order ───────────────────────
+  hc.innerHTML='';
+  window._reflowAnimating = true; // keep guard up
+  const allNewEls = G.hand.map((card,i)=>{
+    const el = makeHcEl(card,i,false);
+    hc.appendChild(el);
+    return el;
   });
+  void hc.getBoundingClientRect();
 
-  // STEP 3: force layout — browser now positions alive cards in new gapless positions
-  void hcContainer.getBoundingClientRect();
+  // ── Step 6: for each element in new DOM, set --dx so it appears ─
+  // at the position it came FROM (old position for existing cards,
+  // deck position for new cards)
+  const deckEl = document.getElementById('deck-ours');
+  const deckRect = deckEl?.getBoundingClientRect();
+  const deckCx = deckRect ? deckRect.left+deckRect.width/2 : window.innerWidth-80;
+  const deckCy = deckRect ? deckRect.top+deckRect.height/2 : window.innerHeight*0.6;
 
-  // STEP 4: read new positions of alive cards
-  const newPositions = new Map();
-  aliveEls.forEach(el => {
-    newPositions.set(el, el.getBoundingClientRect().left);
-  });
-
-  // STEP 5: for each alive card, offset its --dx so it appears at OLD position
-  aliveEls.forEach(el => {
-    const oldX = oldPositions.get(el);
-    const newX = newPositions.get(el);
-    const dx = oldX - newX; // positive = card needs to appear further right
-    if(Math.abs(dx) > 0.5) {
-      el.style.transition = 'none';
-      el.style.setProperty('--dx', dx + 'px');
+  // Read final positions from live DOM (after rebuild)
+  void hc.getBoundingClientRect();
+  allNewEls.forEach((el,i)=>{
+    const card = G.hand[i];
+    const r = el.getBoundingClientRect();
+    const newCx = r.left + r.width/2;
+    const newCy = r.top  + r.height/2;
+    const artSrc = el.querySelector('.hc-art')?.src||'';
+    const isNewCard = newCards.includes(card);
+    if(isNewCard) {
+      // New card: starts at deck position, slides to hand
+      el.style.setProperty('--dx',(deckCx-newCx)+'px');
+      el.style.setProperty('--dy',(deckCy-newCy)+'px');
+    } else {
+      // Existing card: starts at its old position
+      const oldCx = artSrcToCx.get(artSrc) ?? newCx;
+      el.style.setProperty('--dx',(oldCx-newCx)+'px');
+      el.style.setProperty('--dy','0px');
     }
+    el.style.transition='none';
+    el.style.opacity='1';
   });
+  void hc.getBoundingClientRect();
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 
-  // STEP 6: force paint of the offset state
-  void hcContainer.getBoundingClientRect();
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => requestAnimationFrame(r));
-
-  // STEP 7: animate --dx to 0 using rAF loop (CSS custom props aren't transitionable directly)
-  const startTime = performance.now();
-  const startDx = new Map();
-  aliveEls.forEach(el => {
-    startDx.set(el, parseFloat(el.style.getPropertyValue('--dx') || '0'));
-  });
-  const easeInOut = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-
-  await new Promise(resolve => {
-    function frame(now) {
-      const t = Math.min(1, (now - startTime) / CLOSE_DUR);
-      const e = easeInOut(t);
-      aliveEls.forEach(el => {
-        const dx0 = startDx.get(el) || 0;
-        if(Math.abs(dx0) > 0.5) {
-          el.style.setProperty('--dx', (dx0 * (1 - e)) + 'px');
-        }
+  // ── Step 7: slide everything to final positions simultaneously ──
+  const t0=performance.now();
+  const SLIDE=380;
+  const dx0=allNewEls.map(el=>parseFloat(el.style.getPropertyValue('--dx')||'0'));
+  const dy0=allNewEls.map(el=>parseFloat(el.style.getPropertyValue('--dy')||'0'));
+  const ease=t=>t<0.5?2*t*t:-1+(4-2*t)*t;
+  await new Promise(resolve=>{
+    function frame(now){
+      const t=Math.min(1,(now-t0)/SLIDE),e=ease(t);
+      allNewEls.forEach((el,i)=>{
+        el.style.setProperty('--dx',(dx0[i]*(1-e))+'px');
+        el.style.setProperty('--dy',(dy0[i]*(1-e))+'px');
       });
-      if(t < 1) requestAnimationFrame(frame);
-      else {
-        aliveEls.forEach(el => el.style.setProperty('--dx', '0px'));
+      if(t<1)requestAnimationFrame(frame);
+      else{
+        allNewEls.forEach(el=>{
+          el.style.setProperty('--dx','0px');
+          el.style.setProperty('--dy','0px');
+        });
         resolve();
       }
     }
     requestAnimationFrame(frame);
   });
 
-  // Switch to flex-start + padding-left to anchor hand on left.
-  // This prevents recentring jitter when cards are appended one by one.
-  const SHIFT_DUR = 220;
-  const hcWrap = document.getElementById('hand-container');
-  if(hcWrap && deadIndices.length > 0) {
-    const sampleHc = hcWrap.querySelector('.hc');
-    const cardW = sampleHc ? sampleHc.getBoundingClientRect().width : 120;
-    const slotW = cardW - 24;
-
-    // Current alive card count after gap-close
-    const aliveCount = hcWrap.querySelectorAll('.hc').length;
-    // Real width: N cards each cardW wide, overlapping by 24px between each pair
-    const currentHandW = aliveCount * cardW - Math.max(0, aliveCount - 1) * 24;
-    // padding-left that centres this hand
-    const centredPad = Math.max(0, (window.innerWidth - currentHandW) / 2);
-    // Shift left = only 1 full slot width (not per-dead-card — that was too much)
-    const shiftPx = Math.round(deadIndices.length * slotW * 0.5);
-    // Cap shift so we never push past the viewport edge
-    const cappedShift = Math.min(shiftPx, centredPad - 20);
-    const targetPad = Math.max(20, centredPad - cappedShift);
-
-    window._handShiftDone = false;
-    // Switch to flex-start with centred padding (visually same as center)
-    hcWrap.style.justifyContent = 'flex-start';
-    hcWrap.style.paddingLeft = centredPad + 'px';
-    // Force layout
-    void hcWrap.getBoundingClientRect();
-
-    // Animate padding-left down to targetPad = shifts hand left
-    hcWrap.style.transition = `padding-left ${SHIFT_DUR}ms cubic-bezier(0.4,0,0.2,1)`;
-    hcWrap.style.paddingLeft = targetPad + 'px';
-    await new Promise(r => setTimeout(r, SHIFT_DUR + DRAW_DELAY));
-    hcWrap.style.transition = '';
-    window._handShiftDone = true;
-    // Leave flex-start + paddingLeft in place during draw
-    // autoFillHand will call resetHandLayout() when done
-  } else {
-    await new Promise(r => setTimeout(r, DRAW_DELAY));
-  }
   window._reflowAnimating = false;
-  if(callback) callback();
+  if(callback)callback();
 }
 
-// Reset hand-container back to centred layout after draw completes
-function resetHandLayout() {
-  const hc = document.getElementById('hand-container');
-  if(!hc) return;
-  hc.style.transition = 'padding-left 200ms ease';
-  hc.style.justifyContent = '';
-  hc.style.paddingLeft = '';
-  setTimeout(() => { if(hc) hc.style.transition = ''; }, 220);
-}
-
-function renderHandWithNewCards() {
-  // Cards already appended by autoFillHand — just sync state
+function autoFillHand(callback) {
+  // autoFillHand is now handled inside animateHandReflow
+  // This is only called from non-discard paths (initial deal, battle start)
+  const needed=Math.max(0,8-G.hand.length);
+  const toDraw=Math.min(needed,G.deck.length);
+  if(toDraw===0){if(callback)setTimeout(callback,100);return;}
+  for(let i=0;i<toDraw;i++){
+    if(!G.deck.length||G.hand.length>=8)break;
+    G.hand.push({...G.deck.shift()});
+  }
   renderHand(false);
+  if(callback)setTimeout(callback,100);
 }
+
+function measureHandSlots(){return measureSlots(8);}
+function resetHandLayout(){}
+function renderHandWithNewCards(){renderHand(false);}
 
 // ═══════════════════════════════════════════════════════════════
 // BALATRO SCORING ENGINE
@@ -2803,32 +2896,6 @@ function showHandScore(handName, chips, mult, totalDmg, cards) {
 }
 
 // ── AUTO DRAW to fill hand ────────────────────────────────────
-function autoFillHand(callback) {
-  const needed = Math.max(0, 8 - G.hand.length);
-  const toDraw = Math.min(needed, G.deck.length);
-  if(toDraw === 0) { if(callback) setTimeout(callback, 100); return; }
-  const hc = document.getElementById('hand-container');
-  for(let i = 0; i < toDraw; i++) {
-    setTimeout(() => {
-      if(!G.deck.length || G.hand.length >= 8) return;
-      const card = {...G.deck.shift()};
-      G.hand.push(card);
-      const cardIndex = G.hand.length - 1;
-      if(hc && !window._reflowAnimating) {
-        // Append ONE new card element directly — no DOM rebuild, no recentre jitter
-        _dealAnimating.add(cardIndex);
-        const el = makeHcEl(card, cardIndex, true); // hidden until ghost lands
-        hc.appendChild(el);
-        requestAnimationFrame(() => dealFromDeckToHand(el, card, 'ours',
-          parseFloat(el.style.getPropertyValue('--tilt')) || 0, cardIndex));
-      } else {
-        // Fallback: full rebuild (shouldn't happen during discard flow)
-        renderHand(true);
-      }
-      if(i === toDraw - 1) { setTimeout(() => { resetHandLayout(); if(callback) setTimeout(callback, 100); }, 350); }
-    }, i * 160);
-  }
-}
 
 async function playSelectedHand() {
   if(!G.ourTurn || G.animating || G_selected.size === 0) return;
@@ -3546,20 +3613,11 @@ async function dealFromDeckToHand(destEl, card, side, cardTilt, cardIndex) {
   await d(110);
   frontFace.style.opacity = '1'; back.style.opacity = '0';
 
-  // Phase 2: wait for hand shift to finish before reading card position
-  // (shift animates padding-left — reading during animation gives stale/wrong coords)
-  if(window._handShiftDone === false) {
-    await new Promise(r => {
-      const check = () => window._handShiftDone ? r() : requestAnimationFrame(check);
-      requestAnimationFrame(check);
-    });
-    // Extra frame for layout to settle
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  }
-  const liveTarget = document.querySelectorAll('#hand-container .hc')[cardIndex];
-  const tRect = liveTarget ? liveTarget.getBoundingClientRect() : null;
-  const handCx = tRect ? tRect.left + tRect.width/2  : deckCx + 200;
-  const handCy = tRect ? tRect.top  + tRect.height/2  : deckCy - 100;
+  // Target is the live card's position (already placed by animateHandReflow)
+  const liveT = document.querySelectorAll('#hand-container .hc')[cardIndex];
+  const tR = liveT ? liveT.getBoundingClientRect() : null;
+  const handCx = tR ? tR.left + tR.width/2  : deckCx + 200;
+  const handCy = tR ? tR.top  + tR.height/2 : deckCy - 100;
 
   // Arc animation: LEFT first, then curve UP and land in hand
   // We use a quadratic bezier arc so the card travels in a smooth curve.
@@ -3597,16 +3655,10 @@ async function dealFromDeckToHand(destEl, card, side, cardTilt, cardIndex) {
   const liveHcEls2 = document.querySelectorAll('#hand-container .hc');
   const liveCard = (cardIndex !== undefined) ? liveHcEls2[cardIndex] : null;
   if(liveCard) {
-    liveCard.style.transition = 'none';
-    liveCard.style.animation = 'none';
     liveCard.style.setProperty('--dx', '0px');
     liveCard.style.visibility = '';
     liveCard.style.pointerEvents = '';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if(liveCard) { liveCard.style.transition = ''; liveCard.style.animation = ''; }
-    }));
   }
-  // Remove ghost immediately — live card is at same position
   ghostWrap.remove();
 }
 
@@ -4764,9 +4816,12 @@ let _shopActiveTab = 'All';
 
 function openShop() {
   _popoverEnabled = false; hideItemPopover();
-  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','hd-row','owned-items-panel','hands-panel','gold-display'].forEach(id=>{
+  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','hd-row','hands-panel','gold-display'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
+  // Keep owned-items-panel visible in shop (top-right items display)
+  const oip = document.getElementById('owned-items-panel');
+  if(oip) { oip.style.display=''; updateRunPanel(); }
   document.getElementById('bf-ours') && (document.getElementById('bf-ours').innerHTML='');
   document.getElementById('bf-theirs') && (document.getElementById('bf-theirs').innerHTML='');
   const screen = document.getElementById('shop-screen');
