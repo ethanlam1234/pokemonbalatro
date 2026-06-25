@@ -180,20 +180,8 @@ body {
 
 
 /* ── GOLD DISPLAY (above deck) ── */
-#gold-display {
-  position:fixed; z-index:112; display:none;
-  right:clamp(14px,1.5vw,24px); 
-  /* positioned dynamically above deck */
-  bottom:calc(clamp(80px,9vh,130px) + clamp(110px,9.2vw,148px) * 1.5 + 10px);
-  background:linear-gradient(180deg,#5a3d00,#3a2600);
-  border:3px solid #aa7700; border-radius:8px;
-  padding:6px 16px; text-align:center;
-  font-family:'PokemonClassic',monospace;
-  font-size:clamp(18px,2vw,28px); color:#ffcc22; font-weight:bold;
-  text-shadow:0 0 10px rgba(255,200,0,0.5), 1px 1px 0 #000;
-  box-shadow:0 4px 0 #221400, 0 0 16px rgba(180,120,0,0.3), inset 0 1px 0 rgba(255,220,100,0.2);
-  letter-spacing:1px; white-space:nowrap;
-}
+/* gold-display repurposed — shown inline in owned-items header row */
+#gold-display { display:none; } /* legacy — now rendered inside owned-items-panel header */
 /* ── DEAL GHOST (deck→hand animation) ── */
 .deal-ghost { position:fixed; pointer-events:none; z-index:999; width:clamp(44px,3.8vw,62px); aspect-ratio:2/3; border-radius:6px; overflow:hidden; background:repeating-linear-gradient(135deg,#1a1060 0,#1a1060 6px,#110a44 6px,#110a44 12px); border:2px solid #334488; box-shadow:0 4px 20px rgba(0,0,0,0.85); transform-origin:50% 50%; will-change:transform,opacity; }
 .deal-ghost::after { content:''; position:absolute; inset:3px; border-radius:4px; border:1px solid rgba(100,140,255,0.3); }
@@ -217,11 +205,11 @@ body {
 /* Trainer portrait — two separate blocks */
 #rp-portrait { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
 #rp-portrait-img-wrap {
-  width:75%; aspect-ratio:1/1; overflow:hidden; flex-shrink:0;
+  width:85%; aspect-ratio:1/1; overflow:hidden; flex-shrink:0;
   border-radius:8px; background:#0a0a18;
   border:2px solid rgba(50,70,140,0.6);
   box-shadow:0 4px 14px rgba(0,0,0,0.7);
-  align-self:flex-start;
+  align-self:center;
 }
 #rp-portrait-img-wrap img {
   width:100%; height:100%; object-fit:cover; object-position:center 10%;
@@ -401,6 +389,10 @@ body {
   display:flex; gap:3px; justify-content:center; flex-wrap:wrap;
 }
 #route-confirm-btn {
+  opacity:0.35; pointer-events:none; filter:saturate(0);
+  transition:opacity 0.2s, filter 0.2s;
+}
+#route-confirm-btn.lit {
   margin-top:18px; display:none;
   background:linear-gradient(180deg,#224466,#112233);
   border:2px solid #44aaff; border-radius:8px;
@@ -457,6 +449,28 @@ body {
 }
 .between-skip:hover { color:#99aacc; border-color:#667799; }
 
+
+#route-btn-row {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  margin-top:22px; width:min(95vw,680px);
+}
+#route-confirm-btn {
+  opacity:0.35; pointer-events:none; filter:saturate(0);
+  transition:opacity 0.2s, filter 0.2s;
+}
+#route-confirm-btn.lit {
+  /* always visible, dims when nothing selected */
+}
+#route-secondary-row {
+  display:flex; flex-direction:row; gap:10px; align-items:center; justify-content:center;
+}
+#route-view-deck-btn {
+  font-family:'PokemonClassic',monospace; font-size:clamp(9px,0.9vw,13px);
+  padding:7px 18px; background:rgba(20,30,60,0.85);
+  border:1px solid rgba(60,90,180,0.5); border-radius:6px;
+  color:#7799bb; cursor:pointer; letter-spacing:1px; transition:all 0.15s;
+}
+#route-view-deck-btn:hover { color:#aaccff; border-color:rgba(100,140,255,0.7); }
 /* ── BOTTOM BAR tweaks ── */
 /* Sort row — bigger, white */
 #sort-row {
@@ -856,7 +870,7 @@ body {
 #starter-screen {
   position:fixed; inset:0; z-index:2000;
   display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:clamp(18px,3vh,36px); overflow-y:auto;
+  justify-content:center; gap:clamp(24px,4vh,48px); overflow-y:auto;
   font-family:'PokemonClassic',monospace; background:transparent;
   padding:clamp(20px,3vh,40px) 0;
 }
@@ -878,10 +892,11 @@ body {
 @keyframes shcChosen { 0%{opacity:1}50%{transform:translate(var(--ctx,0),var(--cty,0)) scale(1.14)}75%{transform:translate(var(--ctx,0),var(--cty,0)) scale(0.96)}100%{transform:translate(var(--ctx,0),var(--cty,0)) scale(1);opacity:1} }
 .starter-hc-wrap.shc-dismissed { animation:shcScatter 0.32s ease forwards !important; pointer-events:none; }
 @keyframes shcScatter { to{transform:translateY(80vh) scale(0.3);opacity:0} }
-#starter-confirm { display:flex; flex-direction:column; align-items:center; gap:10px; z-index:200; pointer-events:all; flex-shrink:0; visibility:hidden; pointer-events:none; }
-#starter-confirm.show { visibility:visible; pointer-events:all; animation:fadeUp 0.35s ease both; }
+#starter-confirm { display:flex; flex-direction:column; align-items:center; gap:10px; z-index:200; flex-shrink:0; pointer-events:all; }
+/* starter-confirm always visible — button dims until selection */
 #starter-confirm-name { display:none; }
-#starter-confirm-btn { background:linear-gradient(180deg,#cc9900,#885500); border:2px solid #ffcc00; border-radius:8px; color:#fff; font-family:'PokemonClassic',monospace; font-size:clamp(10px,1.3vw,17px); padding:10px 28px; cursor:pointer; letter-spacing:2px; box-shadow:0 4px 0 #553300,0 0 20px rgba(255,180,0,0.3); transition:transform 0.1s,box-shadow 0.1s; animation:starterBtnPulse 1.5s ease infinite; }
+#starter-confirm-btn { background:linear-gradient(180deg,#443300,#2a1a00); border:2px solid #665500; border-radius:8px; color:#998866; font-family:'PokemonClassic',monospace; font-size:clamp(10px,1.3vw,17px); padding:10px 28px; cursor:not-allowed; letter-spacing:2px; box-shadow:0 4px 0 #221100; transition:all 0.25s ease; opacity:0.55; }
+#starter-confirm-btn.ready { background:linear-gradient(180deg,#cc9900,#885500); border-color:#ffcc00; color:#fff; cursor:pointer; opacity:1; box-shadow:0 4px 0 #553300,0 0 20px rgba(255,180,0,0.3); animation:starterBtnPulse 1.5s ease infinite; }
 @keyframes starterBtnPulse { 0%,100%{box-shadow:0 4px 0 #553300,0 0 20px rgba(255,180,0,0.3);}50%{box-shadow:0 4px 0 #553300,0 0 40px rgba(255,180,0,0.7);} }
 #starter-confirm-btn:hover { transform:translateY(-2px); }
 #starter-confirm-btn:active { transform:translateY(2px); box-shadow:0 2px 0 #553300; }
@@ -994,7 +1009,14 @@ body {
   /* ── Left panel ── */
   #run-panel  { width:clamp(110px,20vw,150px) !important; gap:4px !important; left:6px !important; top:6px !important; }
   #rp-hand-preview { display:none !important; }
-  #rp-portrait-img-wrap { aspect-ratio:1/1 !important; }
+  #rp-portrait-img-wrap { width:50% !important; aspect-ratio:1/1 !important; }
+  /* Route buttons: horizontal on mobile */
+  #route-btn-row {
+    width:min(95vw,680px) !important;
+  }
+  #route-secondary-row {
+    width:100% !important; justify-content:space-between !important;
+  }
   #rp-trainer-name  { font-size:9px !important; }
   #rp-trainer-hp    { font-size:8px !important; }
   #rp-hero-power    { padding:6px 8px !important; }
@@ -1055,7 +1077,11 @@ body {
   #route-pick-label { font-size:9px !important; }
   #route-pokemon-row { gap:7px !important; margin-top:8px !important; padding-top:8px !important; }
   .card-visual      { border-width:1px !important; }
-  #route-confirm-btn { font-size:9px !important; padding:7px 16px !important; }
+  #route-confirm-btn {
+  opacity:0.35; pointer-events:none; filter:saturate(0);
+  transition:opacity 0.2s, filter 0.2s;
+}
+#route-confirm-btn.lit { font-size:9px !important; padding:7px 16px !important; }
   .between-skip      { font-size:8px !important; padding:5px 14px !important; margin-top:8px !important; }
   .daycare-action    { padding:9px 10px !important; width:clamp(110px,20vw,150px) !important; }
   .daycare-action-emoji { font-size:20px !important; }
@@ -1334,21 +1360,26 @@ function tryFullscreen() {
 document.addEventListener('DOMContentLoaded', checkOrientationStep);
 window.addEventListener('orientationchange', ()=>setTimeout(checkOrientationStep, 400));
 window.addEventListener('resize', checkOrientationStep);
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+            document.mozFullScreenElement || document.msFullscreenElement ||
+            (screen.height - window.innerHeight < 10 && window.innerWidth > window.innerHeight));
+}
 function onFullscreenChange() {
-  if(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+  if(isFullscreen()) {
     document.getElementById('rotate-overlay').style.display='none';
   }
 }
-document.addEventListener('fullscreenchange', onFullscreenChange);
-document.addEventListener('webkitfullscreenchange', onFullscreenChange);
-document.addEventListener('mozfullscreenchange', onFullscreenChange);
-// Also hide overlay if user goes fullscreen via browser chrome
-document.addEventListener('resize', ()=>{
-  if(window.innerHeight === screen.height || window.outerHeight === screen.height) {
-    const ovr = document.getElementById('rotate-overlay');
-    if(ovr && window.innerWidth > window.innerHeight) ovr.style.display='none';
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(e=>
+  document.addEventListener(e, onFullscreenChange)
+);
+// Poll-based fallback for browsers that don't fire fullscreenchange reliably
+setInterval(()=>{
+  const ovr = document.getElementById('rotate-overlay');
+  if(ovr && ovr.style.display !== 'none') {
+    if(isFullscreen() && window.innerWidth > window.innerHeight) ovr.style.display='none';
   }
-});
+}, 800);
 </script>
 
 <div id="gameWrap" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;">
@@ -1458,7 +1489,7 @@ document.addEventListener('keydown',e=>{
   <!-- Trainer portrait -->
   <div id="rp-portrait">
     <div id="rp-portrait-img-wrap">
-      <img id="tc-opp-img" src="https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/extracted/tc-opp-img.png" alt="">
+      <img id="tc-opp-img" src="https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Brock.png" alt="">
     </div>
     <div id="rp-portrait-overlay">
       <div id="rp-trainer-name">BROCK</div>
@@ -1498,7 +1529,10 @@ document.addEventListener('keydown',e=>{
 
 <div id="item-popover"></div>
 <div id="owned-items-panel" style="display:none;">
-  <div id="owned-items-label">Items</div>
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+    <span id="gold-display" style="font-family:'PokemonClassic',monospace;font-size:clamp(11px,1.1vw,15px);color:#ffcc22;font-weight:bold;text-shadow:0 0 8px rgba(255,200,0,0.5);white-space:nowrap;">$4</span>
+    <span id="owned-items-label">Items</span>
+  </div>
 </div>
 <div id="hand-container" style="display:none"></div>
 <div id="hands-panel" style="display:none;"></div>
@@ -1553,14 +1587,14 @@ const FUSIONS = [{"name": "Hitmoking", "img": "https://raw.githubusercontent.com
 
 // ── TRAINER ROSTER ─────────────────────────────────────────────
 const TRAINERS = [
-  { name:'Brock',    img:'https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/extracted/tc-opp-img.png', hp:20, hpEmoji:'🪨', hpName:'Fortify',   hpDesc:'Give a random friendly Pokemon +2 max HP.',    hpCost:2 },
-  { name:'Misty',    img:'Gyms/Misty.png',    hp:25, hpEmoji:'🌊', hpName:'Surf',      hpDesc:'Deal 1 damage to ALL enemy Pokemon.',           hpCost:2 },
-  { name:'Surge',    img:'Gyms/Surge.png',    hp:28, hpEmoji:'⚡', hpName:'Zap',       hpDesc:'Give a random friendly Pokemon +1 ATK.',        hpCost:2 },
-  { name:'Erika',    img:'Gyms/Erika.png',    hp:30, hpEmoji:'🌸', hpName:'Bloom',     hpDesc:'Heal a random friendly Pokemon for 4 HP.',      hpCost:2 },
-  { name:'Koga',     img:'Gyms/Koga.png',     hp:33, hpEmoji:'☠️', hpName:'Toxic',     hpDesc:'Deal 1 damage to all enemy Pokemon.',           hpCost:2 },
-  { name:'Sabrina',  img:'Gyms/Sabrina.png',  hp:35, hpEmoji:'🔮', hpName:'Foresight', hpDesc:'Draw an extra card.',                          hpCost:2 },
-  { name:'Blaine',   img:'Gyms/Blaine.png',   hp:38, hpEmoji:'🔥', hpName:'Ignite',    hpDesc:'Deal 2 damage to a random enemy Pokemon.',      hpCost:2 },
-  { name:'Giovanni', img:'Gyms/Giovanni.png', hp:45, hpEmoji:'💀', hpName:'Dominate',  hpDesc:'Give all friendly Pokemon +1 ATK permanently.', hpCost:2 },
+  { name:'Brock',    img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Brock.png', hp:20, hpEmoji:'🪨', hpName:'Fortify',   hpDesc:'Give a random friendly Pokemon +2 max HP.',    hpCost:2 },
+  { name:'Misty',    img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Misty.png',    hp:25, hpEmoji:'🌊', hpName:'Surf',      hpDesc:'Deal 1 damage to ALL enemy Pokemon.',           hpCost:2 },
+  { name:'Surge',    img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Surge.png',    hp:28, hpEmoji:'⚡', hpName:'Zap',       hpDesc:'Give a random friendly Pokemon +1 ATK.',        hpCost:2 },
+  { name:'Erika',    img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Erika.png',    hp:30, hpEmoji:'🌸', hpName:'Bloom',     hpDesc:'Heal a random friendly Pokemon for 4 HP.',      hpCost:2 },
+  { name:'Koga',     img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Koga.png',     hp:33, hpEmoji:'☠️', hpName:'Toxic',     hpDesc:'Deal 1 damage to all enemy Pokemon.',           hpCost:2 },
+  { name:'Sabrina',  img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Sabrina.png',  hp:35, hpEmoji:'🔮', hpName:'Foresight', hpDesc:'Draw an extra card.',                          hpCost:2 },
+  { name:'Blaine',   img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Blaine.png',   hp:38, hpEmoji:'🔥', hpName:'Ignite',    hpDesc:'Deal 2 damage to a random enemy Pokemon.',      hpCost:2 },
+  { name:'Giovanni', img:'https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/gyms/Giovanni.png', hp:45, hpEmoji:'💀', hpName:'Dominate',  hpDesc:'Give all friendly Pokemon +1 ATK permanently.', hpCost:2 },
 ];
 
 let G = {
@@ -1833,9 +1867,12 @@ function sortHand(mode) {
   G_sort_mode = mode;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('sort-' + mode)?.classList.add('active');
+  // Remember which CARDS (by identity) are selected before reorder
+  const selectedCards = new Set(Array.from(G_selected).map(i => G.hand[i]).filter(Boolean));
   if(mode === 'species') G.hand.sort((a,b) => (parseInt(a.dexA)||0)-(parseInt(b.dexA)||0));
   else if(mode === 'type') G.hand.sort((a,b) => (a.type1||'').localeCompare(b.type1||''));
-  G_selected.clear();
+  // Restore selection by new indices
+  G_selected = new Set(G.hand.map((c,i) => selectedCards.has(c) ? i : -1).filter(i => i >= 0));
   renderHand();
 }
 
@@ -1896,6 +1933,7 @@ function updateActionBar() {
     if(sel === 0) {
       nameEl.textContent = '—';
       nameEl.className = 'no-hand';
+      if(_activeHandType) { _activeHandType = null; renderHandsPanel(); }
     } else {
       const selectedCards = Array.from(G_selected).sort((a,b)=>a-b).map(i=>G.hand[i]).filter(Boolean);
       const result = evaluateHand(selectedCards);
@@ -1908,9 +1946,15 @@ function updateActionBar() {
           _activeHandType = detectedName;
           renderHandsPanel();
         }
-      } else if(sel < 2) {
-        _activeHandType = null;
-        renderHandsPanel();
+      } else {
+        // Check if remaining selection still matches the active hand type
+        if(_activeHandType) {
+          const stillMatches = detectedName === _activeHandType;
+          if(!stillMatches) {
+            _activeHandType = null;
+            renderHandsPanel();
+          }
+        }
       }
     }
   }
@@ -2176,9 +2220,16 @@ function showHandScore(handName, chips, mult, totalDmg, cards) {
   const overlay = document.createElement('div');
   overlay.id = 'hand-score-overlay';
   overlay.style.cssText = `
-    position:fixed; left:0; right:0; top:20%; z-index:500; pointer-events:none;
-    display:flex; flex-direction:column; align-items:center;
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+    z-index:700; pointer-events:none;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:clamp(6px,1vh,12px);
+    padding:clamp(20px,3vh,40px) clamp(28px,4vw,60px);
+    background:radial-gradient(ellipse 110% 90% at 52% 48%, rgba(4,6,20,0.97) 60%, rgba(2,4,14,0.82) 80%, transparent 100%);
+    border-radius:18px 24px 20px 22px / 22px 18px 24px 20px;
+    box-shadow:0 0 80px 20px rgba(0,0,0,0.7), 0 0 0 1px rgba(40,60,120,0.25);
+    animation:scoreOverlayIn 0.25s ease forwards;
+    width:max-content; max-width:min(94vw,680px);
   `;
 
   // Hand name banner
@@ -2231,7 +2282,7 @@ function showHandScore(handName, chips, mult, totalDmg, cards) {
 
   // Animate in
   const style = document.createElement('style');
-  style.textContent = `@keyframes scorePop{from{opacity:0;transform:scale(0.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}`;
+  style.textContent = `@keyframes scorePop{from{opacity:0;transform:scale(0.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}} @keyframes scoreOverlayIn{from{opacity:0}to{opacity:1}}`;
   document.head.appendChild(style);
 
   // Flash cards
@@ -2485,7 +2536,7 @@ function openRouteScreen() {
   document.getElementById('route-name-display').textContent = routeData.name;
   document.getElementById('route-sub-display').textContent  = routeData.subtitle;
   document.getElementById('route-pick-label').textContent   = 'Pick 1 Pokémon to add to your deck';
-  document.getElementById('route-confirm-btn').style.display = 'none';
+  const rcbReset=document.getElementById('route-confirm-btn');if(rcbReset){rcbReset.style.opacity='0.35';rcbReset.style.pointerEvents='none';rcbReset.style.filter='saturate(0)';}
   _routePicked = null;
   const row = document.getElementById('route-pokemon-row');
   row.innerHTML = '';
@@ -2505,7 +2556,7 @@ function openRouteScreen() {
       row.querySelectorAll('.card-visual').forEach(c=>c.classList.remove('cv-selected'));
       wrap.classList.add('cv-selected');
       _routePicked = card;
-      document.getElementById('route-confirm-btn').style.display = 'block';
+      const rcb=document.getElementById('route-confirm-btn');if(rcb){rcb.style.opacity='1';rcb.style.pointerEvents='all';rcb.style.filter='none';}
     });
     row.appendChild(wrap);
   });
@@ -2610,7 +2661,7 @@ function closeInterludeScreens() {
 
 function hideGameUIForInterlude() {
   _popoverEnabled = false; hideItemPopover();
-  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','gold-display','hd-row','owned-items-panel','hands-panel'].forEach(id=>{
+  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','hd-row','owned-items-panel','hands-panel'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   document.getElementById('bf-ours') && (document.getElementById('bf-ours').innerHTML='');
@@ -2637,7 +2688,7 @@ let _dvSort = 'species';
 
 const DV_HIDE_IDS = [
   'run-panel','hd-row','hands-panel','hand-container','balatro-bottom',
-  'gold-display','owned-items-panel','deck-ours','game-hud',
+  'owned-items-panel','deck-ours','game-hud',
   'shop-screen','route-screen','daycare-screen','route-map-screen'
 ];
 
@@ -2824,12 +2875,8 @@ function autoSelectForHand(handName) {
     if(bestMatch) break;
   }
 
-  if(bestMatch) {
-    G_selected = new Set(bestMatch);
-  } else {
-    // No exact match found — clear selection and show hint
-    G_selected.clear();
-  }
+  // Always replace selection entirely (clear old, set new)
+  G_selected = bestMatch ? new Set(bestMatch) : new Set();
   renderHand();
   updateActionBar();
 }
@@ -3441,7 +3488,7 @@ function updateRunPanel() {
   if(discardsEl) discardsEl.textContent = G.discardsLeft;
   // Gold display above deck
   const goldDisp = document.getElementById('gold-display');
-  if(goldDisp) goldDisp.textContent = '$' + (G.gold || 0);
+  if(goldDisp) { goldDisp.textContent = '$' + (G.gold || 0); goldDisp.style.display=''; }
 }
 
 function initHpTooltips(){
@@ -3701,8 +3748,7 @@ function beginBattle(starterCard) {
   if(bb) bb.style.display='flex';
   const rp = document.getElementById('run-panel');
   if(rp){ rp.style.display='flex'; setTimeout(updateRunPanel, 200); }
-  const gd = document.getElementById('gold-display');
-  if(gd) gd.style.display='block';
+  // gold-display is inside owned-items-panel now
   const hdr = document.getElementById('hd-row');
   if(hdr) hdr.style.display='flex';
   _popoverEnabled = true;
@@ -3810,7 +3856,8 @@ function initStarterDeckScreen() {
   if(!arc) return;
   arc.innerHTML='';
   const conf=document.getElementById('starter-confirm');
-  if(conf) conf.classList.remove('show');
+  const cb=document.getElementById('starter-confirm-btn');
+  if(cb) cb.classList.remove('ready');
   STARTER_DECKS.forEach((deck,i)=>{
     const card=document.createElement('div');
     card.className='deck-choice-card';
@@ -3829,8 +3876,8 @@ function selectStarterDeck(deckId,el){
   G_starterDeckId=deckId;
   if(_selectedDeckEl) _selectedDeckEl.classList.remove('dcc-selected');
   el.classList.add('dcc-selected'); _selectedDeckEl=el;
-  const conf=document.getElementById('starter-confirm');
-  if(conf) conf.classList.add('show');
+  const confirmBtn=document.getElementById('starter-confirm-btn');
+  if(confirmBtn) confirmBtn.classList.add('ready');
 
   // Burst particles
   const rect=el.getBoundingClientRect();
@@ -3861,9 +3908,12 @@ function beginBattleWithDeck(deckId){
   ['hand-container','game-hud','deck-ours','balatro-bottom'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='flex';});
   const bb=document.getElementById('balatro-bottom');if(bb)bb.style.display='flex';
   const rp=document.getElementById('run-panel');if(rp){rp.style.display='flex';setTimeout(updateRunPanel,200);}
-  const gd=document.getElementById('gold-display');if(gd)gd.style.display='block';
+  // gold is inside owned-items-panel
   const hdr=document.getElementById('hd-row');if(hdr)hdr.style.display='flex';
-  const oip=document.getElementById('owned-items-panel');if(oip){oip.style.display='flex';renderOwnedItemsPanel();}
+  const oip=document.getElementById('owned-items-panel');if(oip){oip.style.display='flex';}
+  _popoverEnabled = true;
+  renderOwnedItemsPanel();
+  showHandsPanel();
   initGame();
   initHpTooltips();
 }
@@ -4028,7 +4078,7 @@ let _shopActiveTab = 'All';
 
 function openShop() {
   _popoverEnabled = false; hideItemPopover();
-  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','gold-display','hd-row','owned-items-panel','hands-panel'].forEach(id=>{
+  ['hand-container','game-hud','deck-ours','balatro-bottom','run-panel','hd-row','owned-items-panel','hands-panel'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   document.getElementById('bf-ours') && (document.getElementById('bf-ours').innerHTML='');
@@ -4156,7 +4206,11 @@ function selectShopCard(idx, wrapEl) {
   if(goldEl) goldEl.textContent = 'GOLD: $' + G.gold;
 }
 
-function shopSkip() { startNextBattle(); }
+function shopSkip() {
+  // Re-enable popovers when returning to battle
+  _popoverEnabled = false;
+  startNextBattle();
+}
 
 
 // ═══ ITEM SHOP SYSTEM ════════════════════════════════════════════
@@ -4267,8 +4321,7 @@ function startNextBattle() {
   if(bb2) bb2.style.display='flex';
   const rp2 = document.getElementById('run-panel');
   if(rp2){ rp2.style.display='flex'; setTimeout(updateRunPanel, 200); }
-  const gd2 = document.getElementById('gold-display');
-  if(gd2) gd2.style.display='block';
+  // gold-display is inside owned-items-panel now
   const hdr2 = document.getElementById('hd-row');
   if(hdr2) hdr2.style.display='flex';
   _popoverEnabled = true;
@@ -4323,10 +4376,12 @@ function startNextBattle() {
   <div class="between-subtitle" id="route-sub-display">PALLET → VIRIDIAN CITY</div>
   <div id="route-pick-label">Pick 1 Pokémon to add to your deck</div>
   <div id="route-pokemon-row"></div>
-  <div id="route-btn-row" style="margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:10px;">
-    <button id="route-confirm-btn" onclick="confirmRoutePick()" style="display:none;">ADD TO DECK ✓</button>
-    <button id="route-view-deck-btn" onclick="openDeckViewer()" style="font-family:'PokemonClassic',monospace;font-size:clamp(9px,0.9vw,13px);padding:7px 18px;background:rgba(20,30,60,0.85);border:1px solid rgba(60,90,180,0.5);border-radius:6px;color:#7799bb;cursor:pointer;letter-spacing:1px;transition:all 0.15s;">VIEW DECK</button>
-    <button class="between-skip" onclick="skipRoute()">SKIP →</button>
+  <div id="route-btn-row">
+    <button id="route-confirm-btn" onclick="confirmRoutePick()">ADD TO DECK ✓</button>
+    <div id="route-secondary-row">
+      <button id="route-view-deck-btn" onclick="openDeckViewer()">VIEW DECK</button>
+      <button class="between-skip" onclick="skipRoute()">SKIP →</button>
+    </div>
   </div>
 </div>
 
