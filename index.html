@@ -212,7 +212,7 @@ body {
   transition:transform 0.18s ease, box-shadow 0.18s, z-index 0s, margin-left 320ms cubic-bezier(0.4,0,0.15,1);
   border-radius:8px; overflow:hidden;
   background:#ffffff;
-  border:2px solid rgba(40,60,120,0.85); box-shadow:0 4px 14px rgba(0,0,0,0.8);
+  border:2px solid rgba(50,70,140,0.8); box-shadow:0 4px 14px rgba(0,0,0,0.8);
   user-select:none;
 }
 .hc:hover {
@@ -394,7 +394,7 @@ body {
 #item-popover.visible { opacity:1; }
 /* ── OWNED ITEMS panel (top-right) ── */
 #owned-items-panel {
-  position:fixed; top:18px; right:40px; z-index:111;
+  position:fixed; top:18px; right:52px; z-index:111;
   display:none; flex-direction:column; gap:5px; align-items:flex-end;
   max-width:clamp(160px,16vw,220px); pointer-events:all;
   font-family:'PokemonClassic',monospace;
@@ -995,7 +995,7 @@ body {
 .deck-card:nth-child(2){ transform:translate(0px,-1px) rotate(0.5deg); }
 .deck-card:nth-child(3){ transform:translate(1px,0px) rotate(0deg); }
 .deck-count {
-  position:absolute; top:-32px; right:0; left:auto; text-align:right;
+  position:absolute; top:-22px; right:0; left:auto; text-align:right;
   font-family:'PokemonClassic',monospace; font-size:clamp(11px,1.1vw,15px);
   color:#8899bb; pointer-events:none; white-space:nowrap;
 }
@@ -1255,7 +1255,7 @@ body {
   #rp-hand-preview { display:none !important; }
   #rp-portrait { flex-direction:row !important; align-items:stretch !important; gap:0 !important; }
   #rp-portrait-img-wrap { width:34px !important; min-width:34px !important; height:auto !important; aspect-ratio:unset !important; flex-shrink:0 !important; border-radius:6px 0 0 6px !important; border-right:2px solid rgba(60,90,180,0.5) !important; overflow:hidden !important; }
-  #rp-portrait-img-wrap img { width:100% !important; height:100% !important; object-fit:cover !important; transform:scale(3.2) !important; transform-origin:center 30% !important; }
+  #rp-portrait-img-wrap img { width:100% !important; height:100% !important; object-fit:cover !important; transform:scale(3.0) !important; transform-origin:center 45% !important; }
   #rp-portrait-overlay { flex:1 !important; padding:4px 6px !important; border-radius:0 !important; border-left:none !important; margin-left:0 !important; border-top:none !important; border-bottom:none !important; border-right:none !important; }
   #rp-hp-bar-wrap { height:3px !important; }
   /* Route buttons: horizontal on mobile */
@@ -1271,20 +1271,19 @@ body {
   }
   #route-secondary-row {
     display:contents !important;
-    margin:0 !important;
-    padding:0 !important;
+    margin:0 !important; padding:0 !important;
   }
   #route-view-deck-btn {
-    order:0 !important;
-    margin:0 !important;
+    order:0 !important; margin:0 !important;
+    display:inline-flex !important; align-items:center !important;
   }
   .between-skip {
-    order:1 !important;
-    margin:0 !important;
+    order:1 !important; margin:0 !important;
+    display:inline-flex !important; align-items:center !important;
   }
   #route-btn-row #route-confirm-btn {
-    order:2 !important;
-    margin:0 !important;
+    order:2 !important; margin:0 !important;
+    display:inline-flex !important; align-items:center !important;
   }
   #rp-trainer-name  { font-size:8px !important; }
   #rp-trainer-hp    { font-size:7px !important; }
@@ -1367,7 +1366,7 @@ body {
   #daycare-cards-row    { gap:6px !important; }
 
   /* ── Starter deck screen ── */
-  #starter-screen { padding:8px 0 clamp(60px,9vh,90px) !important; gap:8px !important; }
+  #starter-screen { padding:clamp(40px,8vh,80px) 0 clamp(60px,9vh,90px) !important; gap:clamp(16px,3vh,32px) !important; }
   #starter-main-title { font-size:15px !important; }
   #starter-sub        { font-size:8px !important; }
   #starter-arc-wrap   { gap:6px !important; padding:0 6px !important; }
@@ -1391,8 +1390,9 @@ body {
   .hc-type1,.hc-type2,.pc-type1,.pc-type2 { font-size:7px !important; padding:1px 3px !important; }
 
   /* ── Remove ALL hover effects on touch screens ── */
-  .hc:hover,
-  .hc.hc-floating:hover { transform: rotate(calc(var(--tilt,0deg) + var(--motion-tilt,0deg))) translateX(var(--dx,0px)) translateY(var(--dy,0px)) !important; box-shadow:0 4px 14px rgba(0,0,0,0.8) !important; animation-play-state:running !important; z-index:auto !important; transition:none !important; }
+  .hc:hover { transform: rotate(calc(var(--tilt,0deg) + var(--motion-tilt,0deg))) translateX(var(--dx,0px)) translateY(var(--dy,0px)) !important; box-shadow:0 4px 14px rgba(0,0,0,0.8) !important; z-index:auto !important; transition:none !important; }
+  .hc.hc-floating:hover { animation-play-state:running !important; transform: rotate(calc(var(--tilt,0deg) + var(--motion-tilt,0deg))) translateX(var(--dx,0px)) translateY(var(--dy,0px)) !important; box-shadow:0 4px 14px rgba(0,0,0,0.8) !important; z-index:auto !important; transition:none !important; }
+  .hc.selected-hand:hover { transform: rotate(calc(var(--tilt,0deg) + var(--motion-tilt,0deg))) translateX(var(--dx,0px)) translateY(var(--sel-ty,-22px)) !important; }
   .pc:hover { transform:none !important; box-shadow:0 3px 10px rgba(0,0,0,0.7) !important; }
   .card-visual:hover { transform:none !important; box-shadow:0 2px 8px rgba(0,0,0,0.5) !important; border-color:rgba(60,80,120,0.35) !important; }
   .route-poke-card:hover:not(.selected):not(.taken) { transform:none !important; border-color:rgba(50,70,140,0.5) !important; box-shadow:0 4px 16px rgba(0,0,0,0.7) !important; }
@@ -1646,30 +1646,34 @@ void main(){
 
 
 <!-- Portrait rotation overlay -->
-<div id="rotate-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#080c14;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'PokemonClassic',monospace;color:#ffdd66;text-align:center;pointer-events:all;">
+<div id="rotate-overlay" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'PokemonClassic',monospace;color:#ffdd66;text-align:center;pointer-events:all;">
+  <!-- BG layers bleed through (overlay has no bg, bg canvas is behind) -->
+  <div style="position:absolute;inset:0;background:rgba(4,6,16,0.82);z-index:0;"></div>
   <!-- Step 1: rotate -->
-  <div id="rot-step1">
-    <div style="font-size:52px;animation:rotateHint 2s ease infinite;display:block;margin-bottom:14px;">📱</div>
-    <div style="font-size:14px;letter-spacing:2px;">ROTATE YOUR DEVICE</div>
-    <div style="font-size:9px;color:#7799bb;letter-spacing:1px;margin-top:6px;">RIFTBORN REQUIRES LANDSCAPE</div>
+  <div id="rot-step1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;">
+    <svg width="64" height="64" viewBox="0 0 64 64" style="animation:rotateHint 2s ease infinite;display:block;">
+      <rect x="16" y="8" width="32" height="48" rx="5" fill="#ffdd00" stroke="#111" stroke-width="2"/>
+      <rect x="20" y="14" width="24" height="32" rx="2" fill="#111"/>
+      <circle cx="32" cy="50" r="2.5" fill="#111"/>
+      <path d="M44 30 L54 24 L54 36 Z" fill="#111"/>
+      <path d="M20 30 L10 24 L10 36 Z" fill="#111"/>
+    </svg>
+    <div style="font-size:13px;letter-spacing:2px;">ROTATE YOUR DEVICE</div>
   </div>
-  <!-- Step 2: fullscreen (shown after rotation) -->
-  <div id="rot-step2" style="display:none;flex-direction:column;align-items:center;gap:14px;">
-    <div style="font-size:52px;animation:fullscreenPulse 1.4s ease infinite;display:block;">⛶</div>
-    <div style="font-size:13px;letter-spacing:2px;">GO FULL SCREEN</div>
-    <div style="font-size:9px;color:#7799bb;letter-spacing:1px;margin-top:2px;">TAP FOR BEST EXPERIENCE</div>
-    <button onclick="tryFullscreen()" style="margin-top:8px;background:linear-gradient(180deg,#665500,#443300);border:2px solid #aa8800;border-radius:8px;color:#ffdd66;font-family:'PokemonClassic',monospace;font-size:11px;padding:10px 24px;cursor:pointer;letter-spacing:2px;">FULL SCREEN ⛶</button>
+  <!-- Step 2: fullscreen -->
+  <div id="rot-step2" style="display:none;position:relative;z-index:1;flex-direction:column;align-items:center;gap:14px;">
+    <button onclick="tryFullscreen()" style="background:linear-gradient(180deg,#665500,#443300);border:2px solid #aa8800;border-radius:8px;color:#ffdd66;font-family:'PokemonClassic',monospace;font-size:11px;padding:12px 28px;cursor:pointer;letter-spacing:2px;animation:fullscreenPulse 1.4s ease infinite;">FULL SCREEN ⛶</button>
   </div>
 </div>
 <style>
 @keyframes rotateHint {
-  0%,100%{transform:rotate(0deg);}
-  40%{transform:rotate(90deg);}
-  60%{transform:rotate(90deg);}
+  0%,30%{transform:rotate(0deg);}
+  60%,90%{transform:rotate(-90deg);}
+  100%{transform:rotate(0deg);}
 }
 @keyframes fullscreenPulse {
   0%,100%{transform:scale(1);opacity:1;}
-  50%{transform:scale(1.2);opacity:0.7;}
+  50%{transform:scale(1.08);opacity:0.85;}
 }
 </style>
 <script>
@@ -2704,11 +2708,15 @@ async function animateHandReflow(deadIndices, callback) {
     el.style.setProperty('--dy','0px');
     el.style.setProperty('--motion-tilt','0deg');
   });
-  // Add float after one frame so transforms are committed first
+  // Add float: keep transition:none while animation takes over,
+  // then restore CSS transitions on the next paint.
+  allNewEls.forEach(el=>{
+    el.style.transition = 'none'; // freeze any ongoing transition
+    el.classList.add('hc-floating');
+  });
   requestAnimationFrame(()=>{
-    allNewEls.forEach(el=>{
-      el.style.transition = '';
-      el.classList.add('hc-floating');
+    requestAnimationFrame(()=>{
+      allNewEls.forEach(el=>{ el.style.transition = ''; });
     });
   });
 
