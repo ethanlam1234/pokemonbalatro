@@ -686,15 +686,14 @@ body {
 #dds-subtitle { font-size:clamp(9px,0.95vw,13px); color:#667788; line-height:1.6; }
 /* Cards grid */
 #dds-cards {
-  flex:1; display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap:10px 10px;
-  align-content:start;
+  flex:1; display:flex; flex-wrap:wrap;
+  gap:10px;
+  align-content:flex-start; align-items:flex-start;
 }
 #dds-cards .card-visual:hover,
 #dv-grid .card-visual:hover { transform:none !important; box-shadow:0 2px 8px rgba(0,0,0,0.5) !important; border-color:rgba(60,80,120,0.35) !important; cursor:default !important; }
 .dds-card-slot {
-  width:100%; aspect-ratio:2/3;
+  width:clamp(90px,9vw,125px); aspect-ratio:2/3;
   animation:shopItemIn 0.3s var(--sd,0s) both;
 }
 
@@ -798,13 +797,12 @@ body {
   box-sizing:border-box;
 }
 #dv-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap:10px 10px;
-  width:100%; align-content:start;
+  display:flex; flex-wrap:wrap;
+  gap:10px;
+  width:100%; align-content:flex-start; align-items:flex-start;
 }
 .dv-card-slot {
-  width:100%; aspect-ratio:2/3;
+  width:clamp(110px,9.5vw,145px); aspect-ratio:2/3;
   animation:shopItemIn 0.3s var(--sd,0s) both;
 }
 
@@ -1646,11 +1644,13 @@ void main(){
 
 
 <!-- Portrait rotation overlay -->
-<div id="rotate-overlay" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'PokemonClassic',monospace;color:#ffdd66;text-align:center;pointer-events:all;">
-  <!-- BG layers bleed through (overlay has no bg, bg canvas is behind) -->
-  <div style="position:absolute;inset:0;background:rgba(4,6,16,0.82);z-index:0;"></div>
+<div id="rotate-overlay" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:'PokemonClassic',monospace;color:#ffdd66;text-align:center;pointer-events:all;" onclick="if(document.getElementById('rot-step2').style.display!=='none'){tryFullscreen();}">
+  <!-- Scanlines overlay (CRT effect inside overlay) -->
+  <div style="position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0px,rgba(0,0,0,0.15) 2px,transparent 2px,transparent 4px);mix-blend-mode:multiply;"></div>
+  <!-- Semi-transparent bg so the bg canvas shows through -->
+  <div style="position:absolute;inset:0;background:rgba(4,6,16,0.75);z-index:0;"></div>
   <!-- Step 1: rotate -->
-  <div id="rot-step1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div id="rot-step1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
     <svg width="64" height="64" viewBox="0 0 64 64" style="animation:rotateHint 2s ease infinite;display:block;">
       <rect x="16" y="8" width="32" height="48" rx="5" fill="#ffdd00" stroke="#111" stroke-width="2"/>
       <rect x="20" y="14" width="24" height="32" rx="2" fill="#111"/>
@@ -1660,9 +1660,11 @@ void main(){
     </svg>
     <div style="font-size:13px;letter-spacing:2px;">ROTATE YOUR DEVICE</div>
   </div>
-  <!-- Step 2: fullscreen -->
-  <div id="rot-step2" style="display:none;position:relative;z-index:1;flex-direction:column;align-items:center;gap:14px;">
-    <button onclick="tryFullscreen()" style="background:linear-gradient(180deg,#665500,#443300);border:2px solid #aa8800;border-radius:8px;color:#ffdd66;font-family:'PokemonClassic',monospace;font-size:11px;padding:12px 28px;cursor:pointer;letter-spacing:2px;animation:fullscreenPulse 1.4s ease infinite;">FULL SCREEN ⛶</button>
+  <!-- Step 2: fullscreen (tap anywhere) -->
+  <div id="rot-step2" style="display:none;position:relative;z-index:1;flex-direction:column;align-items:center;gap:16px;">
+    <div style="font-size:52px;animation:fullscreenPulse 1.4s ease infinite;display:block;">⛶</div>
+    <div style="font-size:13px;letter-spacing:2px;">GO FULL SCREEN</div>
+    <div style="font-size:9px;color:#aabbcc;letter-spacing:1px;margin-top:4px;">TAP ANYWHERE TO CONTINUE</div>
   </div>
 </div>
 <style>
@@ -1683,22 +1685,26 @@ function checkOrientationStep() {
   if(!overlay) return;
   const isPortrait = window.innerHeight > window.innerWidth;
   const isMobile = Math.min(window.screen.width, window.screen.height) < 600;
-  if(!isMobile) { overlay.style.display='none'; return; }
+  const gw = document.getElementById('gameWrap');
+  if(!isMobile) { overlay.style.display='none'; if(gw) gw.style.visibility=''; return; }
   if(isPortrait) {
     overlay.style.display='flex';
-    document.getElementById('rot-step1').style.display='block';
+    if(gw) gw.style.visibility='hidden';
+    document.getElementById('rot-step1').style.display='flex';
     document.getElementById('rot-step2').style.display='none';
   } else {
     // Landscape — show fullscreen step
     overlay.style.display='flex';
     document.getElementById('rot-step1').style.display='none';
     document.getElementById('rot-step2').style.display='flex';
+    const gw2 = document.getElementById('gameWrap');
+    if(gw2) gw2.style.visibility='hidden';
   }
 }
 function tryFullscreen() {
   const el = document.documentElement;
   const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-  const hide = () => { document.getElementById('rotate-overlay').style.display='none'; };
+  const hide = () => { document.getElementById('rotate-overlay').style.display='none'; const gw=document.getElementById('gameWrap'); if(gw) gw.style.visibility=''; };
   if(req) {
     const p = req.call(el);
     if(p && p.then) { p.then(hide).catch(hide); }
