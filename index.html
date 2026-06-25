@@ -176,6 +176,11 @@ body {
   animation-play-state: paused;
 }
 
+
+/* Smooth entry into float animation */
+.hc.hc-float-enter {
+  transition: transform 0.4s ease !important;
+}
 @keyframes discardFly {
   0%   { transform:rotate(var(--tilt,0deg)) translateY(0) rotateY(0deg) rotateZ(0deg) scale(1); opacity:1; }
   15%  { transform:rotate(var(--tilt,0deg)) translateY(-18px) translateX(30px) rotateY(-12deg) rotateZ(-4deg) scale(1.05); opacity:1; }
@@ -207,7 +212,7 @@ body {
   transition:transform 0.18s ease, box-shadow 0.18s, z-index 0s, margin-left 320ms cubic-bezier(0.4,0,0.15,1);
   border-radius:8px; overflow:hidden;
   background:#ffffff;
-  border:2px solid rgba(60,80,120,0.45); box-shadow:0 4px 14px rgba(0,0,0,0.8);
+  border:2px solid rgba(20,20,30,0.75); box-shadow:0 4px 14px rgba(0,0,0,0.8);
   user-select:none;
 }
 .hc:hover {
@@ -686,6 +691,8 @@ body {
   gap:10px 10px;
   align-content:start;
 }
+#dds-cards .card-visual:hover,
+#dv-grid .card-visual:hover { transform:none !important; box-shadow:0 2px 8px rgba(0,0,0,0.5) !important; border-color:rgba(60,80,120,0.35) !important; cursor:default !important; }
 .dds-card-slot {
   width:100%; aspect-ratio:2/3;
   animation:shopItemIn 0.3s var(--sd,0s) both;
@@ -2225,9 +2232,10 @@ function makeHcEl(card, i, isHidden) {
   const ring = document.createElement('div'); ring.className = 'hc-select-ring';
   el.appendChild(ring);
   el.addEventListener('click', () => toggleHandSelect(i));
-  const floatDur = 2.8 + (i * 0.18) % 1.2;
-  // Positive delays: cards start float at different times (no mid-cycle jump)
-  const floatDelay = (i * 0.38) % floatDur;
+  const floatDur = 2.8 + (i * 0.22) % 1.0; // 2.8-3.8s range
+  // Negative delays = animation already in progress (staggered, no waiting)
+  // Negative value is -phase into the cycle so each card is at a different point
+  const floatDelay = -((i * 0.55) % floatDur);
   el.style.setProperty('--float-dur',   floatDur.toFixed(2) + 's');
   el.style.setProperty('--float-delay', floatDelay.toFixed(2) + 's');
   // hc-floating added after FLIP animation by animateHandReflow
@@ -2255,9 +2263,12 @@ function renderHand(animateLast) {
       const tilt = parseFloat(el.style.getPropertyValue('--tilt')) || 0;
       requestAnimationFrame(() => dealFromDeckToHand(el, card, 'ours', tilt, i));
     }
+    el.classList.add('hc-float-enter');
     el.classList.add('hc-floating');
     el._addFloatAfterFlip = false;
     hc.appendChild(el);
+    // Remove entry transition after it's no longer needed
+    setTimeout(()=>{ el.classList.remove('hc-float-enter'); }, 450);
   });
   updateActionBar();
 }
@@ -2679,7 +2690,9 @@ async function animateHandReflow(deadIndices, callback) {
     el.style.pointerEvents = '';
     el.style.transition = '';
     el.style.visibility = '';
+    el.classList.add('hc-float-enter');
     el.classList.add('hc-floating');
+    setTimeout(()=>{ el.classList.remove('hc-float-enter'); }, 450);
   });
 
   window._reflowAnimating = false;
