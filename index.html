@@ -147,13 +147,14 @@ body {
 }
 .hc-select-ring {
   position:absolute; inset:0; border-radius:8px; pointer-events:none;
-  border:2px solid transparent; transition:border-color 0.1s, box-shadow 0.1s;
+  border:1px solid transparent;
+  transition:border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .hc.selected-hand .hc-select-ring {
-  border-color:#ffdd00;
-  box-shadow:0 0 0 2px #ffdd00, 0 0 18px rgba(255,210,0,0.6);
+  border-color:rgba(255,220,60,0.7);
+  box-shadow:0 0 0 1px rgba(255,210,0,0.4), 0 0 10px rgba(255,200,0,0.25);
 }
-.hc.selected-hand { transform: rotate(var(--tilt,0deg)) translateY(-36px) scale(1.08) !important; z-index:15 !important; }
+.hc.selected-hand { transform:rotate(var(--tilt,0deg)) translateY(-28px) scale(1.05) !important; z-index:15 !important; transition:transform 0.2s ease !important; }
 /* ── ALWAYS-VISIBLE OPP HERO POWER CARD ── */
 .opp-hp-card {
   margin-top:6px;
@@ -216,10 +217,11 @@ body {
 /* Trainer portrait — two separate blocks */
 #rp-portrait { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
 #rp-portrait-img-wrap {
-  width:100%; aspect-ratio:3/2; overflow:hidden; flex-shrink:0;
+  width:75%; aspect-ratio:1/1; overflow:hidden; flex-shrink:0;
   border-radius:8px; background:#0a0a18;
   border:2px solid rgba(50,70,140,0.6);
   box-shadow:0 4px 14px rgba(0,0,0,0.7);
+  align-self:flex-start;
 }
 #rp-portrait-img-wrap img {
   width:100%; height:100%; object-fit:cover; object-position:center 10%;
@@ -335,7 +337,7 @@ body {
   font-family:'PokemonClassic',monospace;
 }
 #owned-items-label {
-  font-size:clamp(7px,0.7vw,9px); color:#445566; letter-spacing:2px;
+  font-size:clamp(10px,1.0vw,13px); color:#ccd6f0; letter-spacing:2px;
   text-transform:uppercase; text-align:right;
 }
 .owned-item-chip {
@@ -854,9 +856,9 @@ body {
 #starter-screen {
   position:fixed; inset:0; z-index:2000;
   display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:clamp(12px,2vh,24px); overflow-y:auto;
+  justify-content:center; gap:clamp(18px,3vh,36px); overflow-y:auto;
   font-family:'PokemonClassic',monospace; background:transparent;
-  padding:clamp(16px,2vh,32px) 0 clamp(80px,10vh,120px);
+  padding:clamp(20px,3vh,40px) 0;
 }
 #starter-header { flex-shrink:0; padding:0; margin-bottom:0; text-align:center; pointer-events:none; z-index:2; }
 #starter-main-title { font-size:clamp(13px,1.8vw,22px); color:#ffdd66; letter-spacing:3px; text-shadow:2px 2px 0 #000,0 0 20px rgba(255,210,0,0.4); }
@@ -876,8 +878,8 @@ body {
 @keyframes shcChosen { 0%{opacity:1}50%{transform:translate(var(--ctx,0),var(--cty,0)) scale(1.14)}75%{transform:translate(var(--ctx,0),var(--cty,0)) scale(0.96)}100%{transform:translate(var(--ctx,0),var(--cty,0)) scale(1);opacity:1} }
 .starter-hc-wrap.shc-dismissed { animation:shcScatter 0.32s ease forwards !important; pointer-events:none; }
 @keyframes shcScatter { to{transform:translateY(80vh) scale(0.3);opacity:0} }
-#starter-confirm { display:none; flex-direction:column; align-items:center; gap:10px; z-index:200; pointer-events:all; animation:fadeUp 0.4s ease both; flex-shrink:0; }
-#starter-confirm.show { display:flex; }
+#starter-confirm { display:flex; flex-direction:column; align-items:center; gap:10px; z-index:200; pointer-events:all; flex-shrink:0; visibility:hidden; pointer-events:none; }
+#starter-confirm.show { visibility:visible; pointer-events:all; animation:fadeUp 0.35s ease both; }
 #starter-confirm-name { display:none; }
 #starter-confirm-btn { background:linear-gradient(180deg,#cc9900,#885500); border:2px solid #ffcc00; border-radius:8px; color:#fff; font-family:'PokemonClassic',monospace; font-size:clamp(10px,1.3vw,17px); padding:10px 28px; cursor:pointer; letter-spacing:2px; box-shadow:0 4px 0 #553300,0 0 20px rgba(255,180,0,0.3); transition:transform 0.1s,box-shadow 0.1s; animation:starterBtnPulse 1.5s ease infinite; }
 @keyframes starterBtnPulse { 0%,100%{box-shadow:0 4px 0 #553300,0 0 20px rgba(255,180,0,0.3);}50%{box-shadow:0 4px 0 #553300,0 0 40px rgba(255,180,0,0.7);} }
@@ -1320,21 +1322,32 @@ function checkOrientationStep() {
 function tryFullscreen() {
   const el = document.documentElement;
   const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  const hide = () => { document.getElementById('rotate-overlay').style.display='none'; };
   if(req) {
-    req.call(el).then(() => {
-      document.getElementById('rotate-overlay').style.display='none';
-    }).catch(() => {
-      document.getElementById('rotate-overlay').style.display='none';
-    });
+    const p = req.call(el);
+    if(p && p.then) { p.then(hide).catch(hide); }
+    else { setTimeout(hide, 400); }
   } else {
-    document.getElementById('rotate-overlay').style.display='none';
+    hide();
   }
 }
 document.addEventListener('DOMContentLoaded', checkOrientationStep);
 window.addEventListener('orientationchange', ()=>setTimeout(checkOrientationStep, 400));
 window.addEventListener('resize', checkOrientationStep);
-document.addEventListener('fullscreenchange', ()=>{
-  if(document.fullscreenElement) document.getElementById('rotate-overlay').style.display='none';
+function onFullscreenChange() {
+  if(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+    document.getElementById('rotate-overlay').style.display='none';
+  }
+}
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+document.addEventListener('mozfullscreenchange', onFullscreenChange);
+// Also hide overlay if user goes fullscreen via browser chrome
+document.addEventListener('resize', ()=>{
+  if(window.innerHeight === screen.height || window.outerHeight === screen.height) {
+    const ovr = document.getElementById('rotate-overlay');
+    if(ovr && window.innerWidth > window.innerHeight) ovr.style.display='none';
+  }
 });
 </script>
 
@@ -4261,7 +4274,9 @@ function startNextBattle() {
   _popoverEnabled = true;
   showHandsPanel();
   const oip2 = document.getElementById('owned-items-panel');
-  if(oip2){ oip2.style.display='flex'; renderOwnedItemsPanel(); }
+  if(oip2){ oip2.style.display='flex'; }
+  _popoverEnabled = true;
+  renderOwnedItemsPanel();
   G.handsLeft=3; G.discardsLeft=3; G.roundScore=0; G.roundChips=0; G.roundMult=0;
 
   const fuseLabel = document.getElementById('fuse-lbl');
