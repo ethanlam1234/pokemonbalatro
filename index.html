@@ -13,10 +13,19 @@
 body {
   background:#080c14; width:100vw; height:100vh;
   display:flex; align-items:center; justify-content:center;
+  filter: url(#crt-warp-filter) saturate(1.06) contrast(1.04);
   overflow:hidden;
 }
 /* Portrait handled by JS checkOrientationStep() */
-#gameWrap { filter: url(#crt-warp-filter) saturate(1.06) contrast(1.04); position:fixed; inset:0; width:100vw; height:100vh; overflow:hidden; }
+#gameWrap { position:fixed; inset:0; width:100vw; height:100vh; overflow:hidden; }
+
+/* ── BALATRO-STYLE CRT EFFECT ── */
+/* Vignette: darkens edges like a CRT screen */
+/* CRT: apply warp filter to html element so EVERYTHING is affected */
+html { overflow: hidden; }
+/* Vignette removed */
+
+
 .bf-zone {
   position:fixed; display:flex; align-items:center;
   justify-content:center; gap:1.2%; pointer-events:none;
@@ -226,8 +235,8 @@ body {
   transition:border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .hc.selected-hand .hc-select-ring {
-  border-color:rgba(255,220,60,0.7);
-  box-shadow:0 0 0 1px rgba(255,210,0,0.4), 0 0 10px rgba(255,200,0,0.25);
+  border-color:rgba(100,160,255,0.5);
+  box-shadow:0 0 0 1px rgba(80,140,255,0.3), 0 0 8px rgba(80,140,255,0.2);
 }
 .hc.selected-hand { --sel-ty:-22px; z-index:15 !important; }
 /* ── ALWAYS-VISIBLE OPP HERO POWER CARD ── */
@@ -257,7 +266,7 @@ body {
 /* ── GOLD DISPLAY (above deck) ── */
 /* gold-display is the span inside owned-items-panel header */
 /* ── DEAL GHOST (deck→hand animation) ── */
-.deal-ghost { position:fixed; pointer-events:none; z-index:999; width:clamp(44px,3.8vw,62px); aspect-ratio:2/3; border-radius:6px; overflow:hidden; background:repeating-linear-gradient(135deg,#1a1060 0,#1a1060 6px,#110a44 6px,#110a44 12px); border:2px solid #334488; box-shadow:0 4px 20px rgba(0,0,0,0.85); transform-origin:50% 50%; will-change:transform,opacity; }
+.deal-ghost { position:fixed; pointer-events:none; z-index:999; width:clamp(44px,3.8vw,62px); aspect-ratio:2/3; border-radius:6px; overflow:hidden; background:#0a0a0a; border:2px solid rgba(20,20,30,0.9); box-shadow:0 4px 20px rgba(0,0,0,0.95); transform-origin:50% 50%; will-change:transform,opacity; }
 .deal-ghost::after { content:''; position:absolute; inset:3px; border-radius:4px; border:1px solid rgba(100,140,255,0.3); }
 .deal-ghost .face { position:absolute; inset:0; border-radius:5px; overflow:hidden; background:linear-gradient(160deg,#1a1a2e 0%,#0d0d1a 100%); border:none; display:none; }
 .deal-ghost .face img { position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); height:100%; width:auto; object-fit:contain; image-rendering:pixelated; background:transparent; }
@@ -394,7 +403,7 @@ body {
 #item-popover.visible { opacity:1; }
 /* ── OWNED ITEMS panel (top-right) ── */
 #owned-items-panel {
-  position:fixed; top:18px; right:52px; z-index:111;
+  position:fixed; top:18px; right:12px; z-index:111;
   display:none; flex-direction:column; gap:5px; align-items:flex-end;
   max-width:clamp(160px,16vw,220px); pointer-events:all;
   font-family:'PokemonClassic',monospace;
@@ -993,7 +1002,7 @@ body {
 .deck-card:nth-child(2){ transform:translate(0px,-1px) rotate(0.5deg); }
 .deck-card:nth-child(3){ transform:translate(1px,0px) rotate(0deg); }
 .deck-count {
-  position:absolute; top:-22px; right:0; left:auto; text-align:right;
+  position:absolute; top:-30px; right:0; left:auto; text-align:right;
   font-family:'PokemonClassic',monospace; font-size:clamp(11px,1.1vw,15px);
   color:#8899bb; pointer-events:none; white-space:nowrap;
 }
@@ -1409,35 +1418,30 @@ body {
 <div id="balatro-overlay" style="position:fixed;inset:0;z-index:-1;background:rgba(4,6,18,0.78);pointer-events:none;"></div>
 
 
-<!-- ── CRT EFFECT: SVG warp + CSS scanlines ── -->
+
+<!-- ── CRT WARP (original subtle effect) ── -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden;">
   <defs>
-    <!-- Animated displacement for barrel warp on ALL content -->
-    <filter id="crt-warp-filter" x="-4%" y="-4%" width="108%" height="108%"
+    <filter id="crt-warp-filter" x="-5%" y="-5%" width="110%" height="110%"
             color-interpolation-filters="sRGB">
-      <!-- Build a radial gradient as displacement map -->
-      <!-- We use feTurbulence with very low freq as a static radial-like map -->
-      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.015"
-                    numOctaves="1" seed="5" result="warpMap"/>
-      <feColorMatrix type="saturate" values="1.12" in="SourceGraphic" result="saturated"/>
-      <feDisplacementMap in="saturated" in2="warpMap"
-                         scale="14" xChannelSelector="R" yChannelSelector="G"
-                         result="warped" id="crt-displacement"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.0008 0.0008"
+                    numOctaves="1" seed="7" result="warpMap"/>
+      <feDisplacementMap in="SourceGraphic" in2="warpMap"
+                         scale="40" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
 </svg>
 
-<!-- Scanline overlay (CSS only, no WebGL needed) -->
+<!-- Scanline overlay -->
 <div id="crt-scanlines" style="
-  position:fixed;inset:0;z-index:8999;pointer-events:none;
+  position:fixed;inset:0;z-index:9993;pointer-events:none;
   background:repeating-linear-gradient(
     0deg,
-    rgba(0,0,0,0.18) 0px,
-    rgba(0,0,0,0.18) 2px,
-    transparent 2px,
-    transparent 4px
+    rgba(0,0,0,0.05) 0px,
+    rgba(0,0,0,0.05) 3px,
+    transparent 3px,
+    transparent 8px
   );
-  mix-blend-mode:multiply;
 "></div>
 
 <style>
@@ -1445,24 +1449,7 @@ body {
 /* body filter breaks position:fixed, so we use a different method */
 </style>
 
-<script>
-/* Animate the barrel warp displacement scale for subtle pulsing */
-(function(){
-  const filter = document.getElementById('crt-warp-filter');
-  if(!filter) return;
-  const disp = filter.querySelector('feDisplacementMap');
-  if(!disp) return;
-  let t = 0;
-  function frame(){
-    t += 0.005;
-    // Subtle scale oscillation: 5..8 range for gentle pulsing warp
-    const s = 22 + 8 * Math.sin(t * 0.7);
-    disp.setAttribute('scale', s.toFixed(2));
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
-</script>
+
 
 
 
@@ -1650,15 +1637,9 @@ void main(){
   <!-- Semi-transparent bg so the bg canvas shows through -->
   <div style="position:absolute;inset:0;background:rgba(4,6,16,0.75);z-index:0;"></div>
   <!-- Step 1: rotate -->
-  <div id="rot-step1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-    <svg width="64" height="64" viewBox="0 0 64 64" style="animation:rotateHint 2s ease infinite;display:block;">
-      <rect x="16" y="8" width="32" height="48" rx="5" fill="#ffdd00" stroke="#111" stroke-width="2"/>
-      <rect x="20" y="14" width="24" height="32" rx="2" fill="#111"/>
-      <circle cx="32" cy="50" r="2.5" fill="#111"/>
-      <path d="M44 30 L54 24 L54 36 Z" fill="#111"/>
-      <path d="M20 30 L10 24 L10 36 Z" fill="#111"/>
-    </svg>
-    <div style="font-size:13px;letter-spacing:2px;">ROTATE YOUR DEVICE</div>
+  <div id="rot-step1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+    <div style="font-size:20px;letter-spacing:3px;color:#ffdd66;">ROTATE YOUR DEVICE</div>
+    <div style="font-size:9px;color:#8899bb;letter-spacing:2px;margin-top:2px;">RIFTBORN REQUIRES LANDSCAPE MODE</div>
   </div>
   <!-- Step 2: fullscreen (tap anywhere) -->
   <div id="rot-step2" style="display:none;position:relative;z-index:1;flex-direction:column;align-items:center;gap:16px;">
@@ -2090,6 +2071,7 @@ function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
 // ═══ INIT ════════════════════════════════════════════════════════
 function initGame() {
+  document.body.classList.add('game-active');
   // Use starter deck if chosen, otherwise random
   if(G._starterDeckCards && G._starterDeckCards.length) {
     const bonusCopies = G.bonusCards.map(f=>mkCard(f));
@@ -2657,6 +2639,7 @@ async function animateHandReflow(deadIndices, callback) {
   newEls.forEach(el=>{
     el.style.opacity='1';
     el.style.transition='none';
+    el.style.background='#ffffff'; // force white — body filter can cause navy tint
   });
   void hc.getBoundingClientRect();
 
@@ -2742,6 +2725,104 @@ function autoFillHand(callback) {
   }
   renderHand(false);
   if(callback)setTimeout(callback,100);
+}
+
+
+// ── CINNABAR MANSION: Fuse 2 Pokémon ─────────────────────────────
+let _cinnabarSelected = []; // indices into G.deck of selected cards
+
+function openCinnabarMansion() {
+  hideGameUIForInterlude();
+  _cinnabarSelected = [];
+  const row = document.getElementById('cinnabar-hand-row');
+  if(!row) return;
+  row.innerHTML = '';
+
+  // Show a random sample of 5 basic pokemon from the deck + some extras
+  const basicCards = G.deck.filter(c => c.dexB === null || c.dexB === undefined).slice(0, 8);
+  // Add a few randoms if not enough
+  while(basicCards.length < 5) {
+    const d = Math.floor(Math.random()*143)+1;
+    const c = mkBasicCard(d);
+    if(c) basicCards.push(c);
+  }
+  const show = basicCards.slice(0,6);
+
+  show.forEach((card, i) => {
+    const wrap = makeCardVisual(card, `width:clamp(80px,8vw,110px);aspect-ratio:2/3;transition:transform 0.2s,border-color 0.2s;`);
+    wrap.dataset.idx = i;
+    wrap.addEventListener('click', () => {
+      const alreadyIdx = _cinnabarSelected.indexOf(i);
+      if(alreadyIdx >= 0) {
+        _cinnabarSelected.splice(alreadyIdx, 1);
+        wrap.classList.remove('cv-selected');
+      } else if(_cinnabarSelected.length < 2) {
+        _cinnabarSelected.push(i);
+        wrap.classList.add('cv-selected');
+      }
+      updateCinnabarPreview(show);
+    });
+    row.appendChild(wrap);
+  });
+
+  document.getElementById('cinnabar-preview').style.display = 'none';
+  const fuseBtn = document.getElementById('cinnabar-fuse-btn');
+  if(fuseBtn) { fuseBtn.style.opacity='0.4'; fuseBtn.style.pointerEvents='none'; }
+  document.getElementById('cinnabar-screen').classList.add('visible');
+}
+
+function updateCinnabarPreview(cards) {
+  const fuseBtn = document.getElementById('cinnabar-fuse-btn');
+  if(_cinnabarSelected.length < 2) {
+    document.getElementById('cinnabar-preview').style.display = 'none';
+    if(fuseBtn) { fuseBtn.style.opacity='0.4'; fuseBtn.style.pointerEvents='none'; }
+    return;
+  }
+  // Generate a fused card from the 2 selected basic cards
+  const a = cards[_cinnabarSelected[0]];
+  const b = cards[_cinnabarSelected[1]];
+  const fusedName = (a.name.slice(0,3) + b.name.slice(-3)).replace(/[^a-zA-Z]/g,'');
+  const fusedCard = {
+    name: fusedName,
+    img: a.img, fusionImg: b.img, // show B as the art
+    atk: Math.max(a.atk||1, b.atk||1),
+    hp: (a.hp||2) + (b.hp||2),
+    maxHp: (a.hp||2) + (b.hp||2),
+    cost: Math.ceil(((a.cost||2) + (b.cost||2)) / 2),
+    keywords: [...(a.keywords||[]), ...(b.keywords||[])].slice(0,2),
+    dexA: a.dexA, dexB: b.dexA,
+    type1: a.type1, type2: b.type1 !== a.type1 ? b.type1 : b.type2,
+    canAttack:false, exhausted:true, divineShieldUp:false,
+    attacksLeft:0, frozen:false, stealthed:false,
+    id: Math.random().toString(36).slice(2),
+  };
+  // Combine sprites: show both pokemon sprites in the card
+  const resultWrap = document.getElementById('cinnabar-result-card');
+  resultWrap.innerHTML = '';
+  const cv = makeCardVisual(fusedCard, 'width:100%;aspect-ratio:2/3;pointer-events:none;');
+  resultWrap.appendChild(cv);
+  document.getElementById('cinnabar-result-name').textContent = fusedName.toUpperCase();
+  document.getElementById('cinnabar-preview').style.display = 'flex';
+  if(fuseBtn) { fuseBtn.style.opacity='1'; fuseBtn.style.pointerEvents='all'; }
+  // Store fused card for confirm
+  window._pendingFusion = fusedCard;
+}
+
+function confirmFusion() {
+  if(!window._pendingFusion) return;
+  G.deck.push({...window._pendingFusion});
+  shuffle(G.deck);
+  window._pendingFusion = null;
+  _cinnabarSelected = [];
+  closeInterludeScreens();
+  startNextBattle();
+}
+
+function skipCinnabar() {
+  window._pendingFusion = null;
+  _cinnabarSelected = [];
+  closeInterludeScreens();
+  startNextBattle();
 }
 
 function measureHandSlots(){return measureSlots(8);}
@@ -3107,9 +3188,9 @@ async function playSelectedHand() {
       `width:${r.width}px`,`height:${r.height}px`,
       `left:${r.left}px`,`top:${r.top}px`,
       'border-radius:8px','overflow:hidden',
-      'background:#0a0a18',
-      'border:2px solid #ffdd00',
-      'box-shadow:0 0 0 2px #ffdd00,0 0 24px rgba(255,210,0,0.5)',
+      'background:#1a1a1a',
+      'border:none',
+      'box-shadow:0 4px 14px rgba(0,0,0,0.8)',
       'pointer-events:none',
       'transition:none',
       'will-change:transform,opacity',
@@ -3141,7 +3222,7 @@ async function playSelectedHand() {
   cardGhosts.forEach(({ghost}, i) => {
     ghost.style.transition = `transform ${0.22}s cubic-bezier(0.2,0.8,0.3,1) ${i*0.04}s, box-shadow 0.2s ease`;
     ghost.style.transform = `translateY(-22px) scale(1.08) rotate(0deg)`;
-    ghost.style.boxShadow = '0 0 0 3px #ffdd00,0 0 36px rgba(255,210,0,0.8),0 16px 32px rgba(0,0,0,0.8)';
+    ghost.style.boxShadow = '0 4px 20px rgba(0,0,0,0.9),0 16px 32px rgba(0,0,0,0.8)';
   });
   await delay(260 + n * 40);
 
@@ -3156,7 +3237,7 @@ async function playSelectedHand() {
     const delay_i = i * 60;
     ghost.style.transition = `transform 0.42s cubic-bezier(0.22,1.0,0.36,1) ${delay_i}ms, box-shadow 0.3s ease ${delay_i}ms, opacity 0.1s ease`;
     ghost.style.transform = `translate(${dx}px,${dy}px) scale(1.18) rotate(${tilt}deg)`;
-    ghost.style.boxShadow = '0 0 0 3px #ffdd00,0 0 40px rgba(255,210,0,0.8),0 20px 40px rgba(0,0,0,0.9)';
+    ghost.style.boxShadow = '0 4px 24px rgba(0,0,0,0.95),0 20px 40px rgba(0,0,0,0.9)';
   });
   await delay(420 + n * 60 + 80);
 
@@ -3242,7 +3323,7 @@ function renderOwnedItemsPanel() {
 // ══ BETWEEN-BATTLE INTERLUDE SYSTEM ══════════════════════════════
 
 // Which interlude after each gym (0=route, 1=shop, 2=daycare)
-const INTERLUDE_SEQUENCE = ['route', 'shop', 'daycare', 'route', 'shop', 'daycare', 'route', 'shop'];
+const INTERLUDE_SEQUENCE = ['route', 'shop', 'cinnabar', 'route', 'shop', 'daycare', 'route', 'shop'];
 
 // Kanto routes with actual Pokémon and locations
 const KANTO_ROUTES = [
@@ -3278,9 +3359,10 @@ function getInterludeType() {
 
 function openInterlude() {
   const type = getInterludeType();
-  if(type === 'shop')    openShop();
-  else if(type === 'route')   openRouteScreen();
-  else if(type === 'daycare') openDayCareScreen();
+  if(type === 'shop')       openShop();
+  else if(type === 'route')    openRouteScreen();
+  else if(type === 'daycare')  openDayCareScreen();
+  else if(type === 'cinnabar') openCinnabarMansion();
   else openShop();
 }
 
@@ -3298,14 +3380,20 @@ function openRouteScreen() {
   // Create 5-6 fusion cards using route pokemon as bases
   const pickedDex = routeData.pokemon.sort(()=>Math.random()-0.5).slice(0,5);
   pickedDex.forEach((dex, i) => {
-    // Find a fusion featuring this dex number
-    const candidates = FUSIONS.filter(f => {
-      const m = f.img.match(/final_(\d+)-[^_]+_(\d+)-/);
-      return m && (parseInt(m[1])===dex || parseInt(m[2])===dex);
-    });
-    const fusion = candidates.length ? candidates[Math.floor(Math.random()*candidates.length)]
-                                     : FUSIONS[Math.floor(Math.random()*FUSIONS.length)];
-    const card = mkCard(fusion);
+    // 75% chance basic pokemon, 25% chance fusion
+    const useFusion = Math.random() < 0.25;
+    let card;
+    if(!useFusion && KANTO_BY_DEX[dex]) {
+      card = mkBasicCard(dex);
+    } else {
+      const candidates = FUSIONS.filter(f => {
+        const m = f.img.match(/final_(\d+)-[^_]+_(\d+)-/);
+        return m && (parseInt(m[1])===dex || parseInt(m[2])===dex);
+      });
+      const fusion = candidates.length ? candidates[Math.floor(Math.random()*candidates.length)]
+                                       : FUSIONS[Math.floor(Math.random()*FUSIONS.length)];
+      card = mkCard(fusion);
+    }
     const wrap = makeCardVisual(card, 'width:clamp(110px,11vw,155px);aspect-ratio:2/3;animation:shopItemIn 0.4s '+(i*0.08)+'s cubic-bezier(0.15,1.1,0.35,1) both;');
     wrap.addEventListener('click', () => {
       row.querySelectorAll('.card-visual').forEach(c=>c.classList.remove('cv-selected'));
@@ -3463,7 +3551,7 @@ let _dvSort = 'species';
 const DV_HIDE_IDS = [
   'run-panel','hd-row','hands-panel','hand-container','balatro-bottom',
   'owned-items-panel','deck-ours','game-hud',
-  'route-screen','daycare-screen','shop-screen','route-map-screen'
+  'route-screen','daycare-screen','shop-screen','route-map-screen','cinnabar-screen'
 ];
 
 function openDeckViewer() {
@@ -4643,6 +4731,206 @@ function fusionsByDex(dexNums) {
 }
 
 // Helper: build a 52-card deck from weighted pool
+
+// ── Kanto Pokémon data (dex 1–151) ────────────────────────────────
+const KANTO_POKEMON = [
+  // [dex, name, type1, type2 (null if none), hasEvolution (true = not final)]
+  [1,'Bulbasaur','Grass','Poison',true],[2,'Ivysaur','Grass','Poison',true],[3,'Venusaur','Grass','Poison',false],
+  [4,'Charmander','Fire',null,true],[5,'Charmeleon','Fire',null,true],[6,'Charizard','Fire','Flying',false],
+  [7,'Squirtle','Water',null,true],[8,'Wartortle','Water',null,true],[9,'Blastoise','Water',null,false],
+  [10,'Caterpie','Bug',null,true],[11,'Metapod','Bug',null,true],[12,'Butterfree','Bug','Flying',false],
+  [13,'Weedle','Bug','Poison',true],[14,'Kakuna','Bug','Poison',true],[15,'Beedrill','Bug','Poison',false],
+  [16,'Pidgey','Normal','Flying',true],[17,'Pidgeotto','Normal','Flying',true],[18,'Pidgeot','Normal','Flying',false],
+  [19,'Rattata','Normal',null,true],[20,'Raticate','Normal',null,false],
+  [21,'Spearow','Normal','Flying',true],[22,'Fearow','Normal','Flying',false],
+  [23,'Ekans','Poison',null,true],[24,'Arbok','Poison',null,false],
+  [25,'Pikachu','Electric',null,true],[26,'Raichu','Electric',null,false],
+  [27,'Sandshrew','Ground',null,true],[28,'Sandslash','Ground',null,false],
+  [29,'Nidoran-F','Poison',null,true],[30,'Nidorina','Poison',null,true],[31,'Nidoqueen','Poison','Ground',false],
+  [32,'Nidoran-M','Poison',null,true],[33,'Nidorino','Poison',null,true],[34,'Nidoking','Poison','Ground',false],
+  [35,'Clefairy','Normal','Fairy',true],[36,'Clefable','Normal','Fairy',false],
+  [37,'Vulpix','Fire',null,true],[38,'Ninetales','Fire',null,false],
+  [39,'Jigglypuff','Normal','Fairy',true],[40,'Wigglytuff','Normal','Fairy',false],
+  [41,'Zubat','Poison','Flying',true],[42,'Golbat','Poison','Flying',false],
+  [43,'Oddish','Grass','Poison',true],[44,'Gloom','Grass','Poison',true],[45,'Vileplume','Grass','Poison',false],
+  [46,'Paras','Bug','Grass',true],[47,'Parasect','Bug','Grass',false],
+  [48,'Venonat','Bug','Poison',true],[49,'Venomoth','Bug','Poison',false],
+  [50,'Diglett','Ground',null,true],[51,'Dugtrio','Ground',null,false],
+  [52,'Meowth','Normal',null,true],[53,'Persian','Normal',null,false],
+  [54,'Psyduck','Water',null,true],[55,'Golduck','Water',null,false],
+  [56,'Mankey','Fighting',null,true],[57,'Primeape','Fighting',null,false],
+  [58,'Growlithe','Fire',null,true],[59,'Arcanine','Fire',null,false],
+  [60,'Poliwag','Water',null,true],[61,'Poliwhirl','Water',null,true],[62,'Poliwrath','Water','Fighting',false],
+  [63,'Abra','Psychic',null,true],[64,'Kadabra','Psychic',null,true],[65,'Alakazam','Psychic',null,false],
+  [66,'Machop','Fighting',null,true],[67,'Machoke','Fighting',null,true],[68,'Machamp','Fighting',null,false],
+  [69,'Bellsprout','Grass','Poison',true],[70,'Weepinbell','Grass','Poison',true],[71,'Victreebel','Grass','Poison',false],
+  [72,'Tentacool','Water','Poison',true],[73,'Tentacruel','Water','Poison',false],
+  [74,'Geodude','Rock','Ground',true],[75,'Graveler','Rock','Ground',true],[76,'Golem','Rock','Ground',false],
+  [77,'Ponyta','Fire',null,true],[78,'Rapidash','Fire',null,false],
+  [79,'Slowpoke','Water','Psychic',true],[80,'Slowbro','Water','Psychic',false],
+  [81,'Magnemite','Electric','Steel',true],[82,'Magneton','Electric','Steel',false],
+  [83,"Farfetch'd",'Normal','Flying',false],
+  [84,'Doduo','Normal','Flying',true],[85,'Dodrio','Normal','Flying',false],
+  [86,'Seel','Water',null,true],[87,'Dewgong','Water','Ice',false],
+  [88,'Grimer','Poison',null,true],[89,'Muk','Poison',null,false],
+  [90,'Shellder','Water',null,true],[91,'Cloyster','Water','Ice',false],
+  [92,'Gastly','Ghost','Poison',true],[93,'Haunter','Ghost','Poison',true],[94,'Gengar','Ghost','Poison',false],
+  [95,'Onix','Rock','Ground',false],
+  [96,'Drowzee','Psychic',null,true],[97,'Hypno','Psychic',null,false],
+  [98,'Krabby','Water',null,true],[99,'Kingler','Water',null,false],
+  [100,'Voltorb','Electric',null,true],[101,'Electrode','Electric',null,false],
+  [102,'Exeggcute','Grass','Psychic',true],[103,'Exeggutor','Grass','Psychic',false],
+  [104,'Cubone','Ground',null,true],[105,'Marowak','Ground',null,false],
+  [106,'Hitmonlee','Fighting',null,false],[107,'Hitmonchan','Fighting',null,false],
+  [108,'Lickitung','Normal',null,false],
+  [109,'Koffing','Poison',null,true],[110,'Weezing','Poison',null,false],
+  [111,'Rhyhorn','Ground','Rock',true],[112,'Rhydon','Ground','Rock',false],
+  [113,'Chansey','Normal',null,false],
+  [114,'Tangela','Grass',null,false],
+  [115,'Kangaskhan','Normal',null,false],
+  [116,'Horsea','Water',null,true],[117,'Seadra','Water',null,false],
+  [118,'Goldeen','Water',null,true],[119,'Seaking','Water',null,false],
+  [120,'Staryu','Water',null,true],[121,'Starmie','Water','Psychic',false],
+  [122,'Mr. Mime','Psychic','Fairy',false],
+  [123,'Scyther','Bug','Flying',false],
+  [124,'Jynx','Ice','Psychic',false],
+  [125,'Electabuzz','Electric',null,false],
+  [126,'Magmar','Fire',null,false],
+  [127,'Pinsir','Bug',null,false],
+  [128,'Tauros','Normal',null,false],
+  [129,'Magikarp','Water',null,true],[130,'Gyarados','Water','Flying',false],
+  [131,'Lapras','Water','Ice',false],
+  [132,'Ditto','Normal',null,false],
+  [133,'Eevee','Normal',null,true],[134,'Vaporeon','Water',null,false],[135,'Jolteon','Electric',null,false],
+  [136,'Flareon','Fire',null,false],
+  [137,'Porygon','Normal',null,false],
+  [138,'Omanyte','Rock','Water',true],[139,'Omastar','Rock','Water',false],
+  [140,'Kabuto','Rock','Water',true],[141,'Kabutops','Rock','Water',false],
+  [142,'Aerodactyl','Rock','Flying',false],
+  [143,'Snorlax','Normal',null,false],
+  // Legendaries (excluded from most decks)
+  [144,'Articuno','Ice','Flying',false],[145,'Zapdos','Electric','Flying',false],[146,'Moltres','Fire','Flying',false],
+  [147,'Dratini','Dragon',null,true],[148,'Dragonair','Dragon',null,true],[149,'Dragonite','Dragon','Flying',false],
+  [150,'Mewtwo','Psychic',null,false],[151,'Mew','Psychic',null,false],
+];
+
+const LEGENDARIES = new Set([144,145,146,150,151]);
+const KANTO_BY_DEX = {};
+KANTO_POKEMON.forEach(([d,n,t1,t2,hasEvo]) => { KANTO_BY_DEX[d] = {dex:d,name:n,type1:t1,type2:t2,hasEvo}; });
+
+// Make a card from a basic Kanto sprite (not a fusion)
+function mkBasicCard(dexNum) {
+  const pk = KANTO_BY_DEX[dexNum];
+  if(!pk) return null;
+  const sprite = `https://cdn.jsdelivr.net/gh/ethanlam1234/pokemonbalatro@main/sprites/${dexNum}.png`;
+  const cost = Math.floor(Math.random()*4)+1;
+  return {
+    name: pk.name,
+    img: sprite,
+    fusionImg: sprite,
+    atk: Math.floor(Math.random()*4)+1,
+    hp: Math.floor(Math.random()*4)+2,
+    maxHp: 3,
+    cost,
+    keywords: assignKeywords(cost, false),
+    dexA: String(dexNum),
+    dexB: null,
+    type1: pk.type1,
+    type2: pk.type2,
+    canAttack:false, exhausted:true,
+    divineShieldUp: false,
+    attacksLeft:0, frozen:false, stealthed:false,
+    id: Math.random().toString(36).slice(2),
+  };
+}
+
+// ── Species Mastery deck ────────────────────────────────────────
+function buildSpeciesDeck() {
+  const nonLeg = KANTO_POKEMON.filter(([d])=>!LEGENDARIES.has(d));
+  const basics = nonLeg.filter(([d,n,t1,t2,hasEvo]) => {
+    // Prefer basic (stage 1) Pokémon - dex numbers that have an evolution
+    return hasEvo;
+  });
+  const sh = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; };
+
+  // Pick 3 partner Pokémon
+  const partners = sh([...basics]).slice(0,3);
+  const deck = [];
+  // Partner copies: 4+4+3
+  const counts = [4,4,3];
+  partners.forEach(([d],i) => {
+    for(let c=0;c<counts[i];c++) { const card=mkBasicCard(d); if(card) deck.push(card); }
+  });
+  // 4 supporters × 2 copies
+  const partnerDexes = new Set(partners.map(([d])=>d));
+  const supporters = sh(basics.filter(([d])=>!partnerDexes.has(d))).slice(0,4);
+  supporters.forEach(([d]) => {
+    for(let c=0;c<2;c++) { const card=mkBasicCard(d); if(card) deck.push(card); }
+  });
+  // Fill remaining 11 slots with random basics
+  const usedDexes = new Set([...partnerDexes, ...supporters.map(([d])=>d)]);
+  const fillers = sh(nonLeg.filter(([d])=>!usedDexes.has(d))).slice(0,11);
+  fillers.forEach(([d]) => { const card=mkBasicCard(d); if(card) deck.push(card); });
+  return sh(deck).slice(0,30);
+}
+
+// ── Type Specialist deck ────────────────────────────────────────
+function buildTypeDeck() {
+  const types = ['Fire','Water','Grass','Electric','Psychic','Ice','Fighting','Poison','Ground','Flying','Bug','Rock','Ghost','Normal','Dragon'];
+  const chosenType = types[Math.floor(Math.random()*types.length)];
+  const nonLeg = KANTO_POKEMON.filter(([d])=>!LEGENDARIES.has(d));
+  const primary = nonLeg.filter(([d,n,t1,t2])=>t1===chosenType||t2===chosenType);
+  const secondary = nonLeg.filter(([d,n,t1,t2])=>t1!==chosenType&&t2!==chosenType&&primary.length>0);
+  const sh = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; };
+  const deck = [];
+  // 24 from primary type (max 4 copies each)
+  const primPool = sh([...primary]);
+  let added = 0;
+  const copyCounts = {};
+  while(added < 24 && primPool.length > 0) {
+    const [d] = primPool[added % primPool.length];
+    copyCounts[d] = (copyCounts[d]||0)+1;
+    if(copyCounts[d] <= 4) { const card=mkBasicCard(d); if(card){deck.push(card);added++;} }
+    if(added >= primPool.length * 4) break; // safety
+    if(Object.values(copyCounts).every(c=>c>=4)) break;
+    added++;
+  }
+  // Pad primary if needed
+  primPool.forEach(([d]) => { while(deck.length < 24 && (copyCounts[d]||0) < 4) { copyCounts[d]=(copyCounts[d]||0)+1; const c=mkBasicCard(d); if(c) deck.push(c); } });
+  // 6 from secondary (sharing a secondary type with primary)
+  const secCounts = {};
+  sh([...secondary]).slice(0,6).forEach(([d]) => { const c=mkBasicCard(d); if(c) deck.push(c); });
+  return sh(deck.slice(0,30));
+}
+
+// ── Evolution Engineer deck ─────────────────────────────────────
+function buildEvolutionDeck() {
+  // All evo families (first stage → second stage, never final)
+  const families = [
+    [1,2],[4,5],[7,8],[10,11],[13,14],[16,17],[19],[21],[23],
+    [25],[27],[29,30],[32,33],[35],[37],[39],[41],[43,44],[46],
+    [48],[50],[52],[54],[56],[58],[60,61],[63,64],[66,67],[69,70],
+    [72],[74,75],[77],[79],[81],[84],[86],[88],[90],[92,93],
+    [96],[98],[100],[102],[104],[109],[111],[116],[118],[120],
+    [129],[133],[138],[140],[147,148],
+  ];
+  const sh = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; };
+  const chosen = sh([...families]).slice(0,10);
+  const deck = [];
+  chosen.forEach(stages => {
+    if(stages.length >= 2) {
+      // 2 of first stage + 1 of second stage
+      const c1=mkBasicCard(stages[0]); const c2=mkBasicCard(stages[0]);
+      const c3=mkBasicCard(stages[1]);
+      if(c1) deck.push(c1); if(c2) deck.push(c2); if(c3) deck.push(c3);
+    } else {
+      // 3 of first stage
+      for(let i=0;i<3;i++){const c=mkBasicCard(stages[0]); if(c) deck.push(c);}
+    }
+  });
+  return sh(deck).slice(0,30);
+}
+
 function buildDeckOf(coreDexNums, fillDexNums, target) {
   target = target || 30;
   const core = fusionsByDex(coreDexNums);
@@ -4663,44 +4951,28 @@ function buildDeckOf(coreDexNums, fillDexNums, target) {
 
 const STARTER_DECKS = [
   {
-    id:'species', name:'SPECIES', emoji:'⚡', accent:'#ffdd00',
-    subtitle:'Everything revolves around one Pokémon',
-    ability:'Species hands scale massively',
-    weakness:'Vulnerable if bosses punish one species',
-    handFocus:'Species Pair / Trio / Army',
-    buildDeck:()=>buildDeckOf([25,26,172, 19,20, 16,17,18], [13,14,15, 43,44,45, 23,24], 30)
-  },
-  {
-    id:'type', name:'TYPE', emoji:'🔥', accent:'#ff4422',
-    subtitle:'Build a mono-type team',
-    ability:'Consistent type-hand scoring',
-    weakness:'Harder to make rare hands',
+    id:'type', name:'TYPE TECHNICIAN', difficulty:'Beginner', emoji:'🔥', accent:'#ff6633',
+    subtitle:'Master a single type',
+    ability:'Consistent type-hand scoring every round',
+    weakness:'Harder to hit rare high-scoring hands',
     handFocus:'Type Team / Dual Type Team',
-    buildDeck:()=>buildDeckOf([4,5,6, 37,38, 58,59, 126, 136], [21,22, 23,24, 19,20], 30)
+    buildDeck: buildTypeDeck,
   },
   {
-    id:'evolution', name:'EVOLUTION', emoji:'🌿', accent:'#44bb44',
-    subtitle:'Raise your Pokémon',
-    ability:'Evolution upgrades scale stronger',
-    weakness:'Slow early game',
+    id:'species', name:'SPECIES SPECIALIST', difficulty:'Normal', emoji:'⚡', accent:'#ffdd00',
+    subtitle:'Repeated species = explosive scoring',
+    ability:'Species Pair/Trio/Squad hands scale massively',
+    weakness:'Vulnerable if a boss punishes your main species',
+    handFocus:'Species Pair / Trio / Army',
+    buildDeck: buildSpeciesDeck,
+  },
+  {
+    id:'evolution', name:'EVOLUTION ENGINEER', difficulty:'Expert', emoji:'🌿', accent:'#44dd66',
+    subtitle:'Build chains, evolve your strategy',
+    ability:'Evolution combos unlock powerful scaling',
+    weakness:'Slow early game — needs setup turns',
     handFocus:'Evolution Line / Evolution Family',
-    buildDeck:()=>buildDeckOf([1,2,3, 4,5,6, 7,8,9], [16,17,18, 19,20, 39,40, 60,61,62], 30)
-  },
-  {
-    id:'network', name:'NETWORK', emoji:'🔗', accent:'#44aaff',
-    subtitle:'Build connections',
-    ability:'Cards score for linking together',
-    weakness:'Needs specific combinations',
-    handFocus:'Connection Chain / Fusion Network',
-    buildDeck:()=>buildDeckOf([6,9,3,94,25,131,149,143], [55,65,68,112,54,80,131,117], 30)
-  },
-  {
-    id:'mutation', name:'MUTATION', emoji:'🌀', accent:'#cc44ff',
-    subtitle:'Chaos creates power',
-    ability:'The stranger the combo, the stronger',
-    weakness:'Cannot chase predictable hands',
-    handFocus:'Mutation / Rainbow Team',
-    buildDeck:()=>buildDeckOf([129,130,151,132,94,143,65,46,47,54,88,89,35,39,52,74,81,116,147], [], 30)
+    buildDeck: buildEvolutionDeck,
   },
 ];
 
@@ -4708,6 +4980,7 @@ let G_starterDeckId = null;
 let _selectedDeckEl = null;
 
 function initStarterDeckScreen() {
+  document.body.classList.add('game-active');
   // Use Erika's grass palette for starter screen
   if(window._balatroBg) window._balatroBg.setGym(3);
   const screen = document.getElementById('starter-screen');
