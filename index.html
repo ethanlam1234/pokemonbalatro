@@ -1416,6 +1416,10 @@ html { overflow: hidden; }
   #dv-close    { font-size:8px !important; padding:3px 9px !important; }
   .dv-card-slot { width:clamp(78px,13vw,105px) !important; }
   .dds-card-slot { width:clamp(65px,11vw,90px) !important; }
+  #cinnabar-hand-row .card-visual { width:clamp(72px,11vw,95px) !important; }
+  #cinnabar-hand-row { gap:6px !important; margin-bottom:8px !important; padding:6px 0 !important; }
+  #cinnabar-screen .between-title { font-size:clamp(12px,2vw,18px) !important; }
+  #cinnabar-screen .between-subtitle { font-size:clamp(7px,1.2vw,10px) !important; margin-bottom:8px !important; }
   #dv-grid { gap:8px !important; }
 
   /* ── Shop ── */
@@ -1837,12 +1841,18 @@ function checkOrientationStep() {
     document.getElementById('rot-step1').style.display='flex';
     document.getElementById('rot-step2').style.display='none';
   } else {
-    // Landscape — show fullscreen step
-    overlay.style.display='flex';
-    document.getElementById('rot-step1').style.display='none';
-    document.getElementById('rot-step2').style.display='flex';
-    const gw2 = document.getElementById('gameWrap');
-    if(gw2) gw2.style.visibility='hidden';
+    // Landscape — attempt fullscreen immediately, no tap needed
+    tryFullscreen();
+    // tryFullscreen hides overlay on success; only show step2 if it fails
+    setTimeout(()=>{
+      if(!isFullscreen()) {
+        overlay.style.display='flex';
+        document.getElementById('rot-step1').style.display='none';
+        document.getElementById('rot-step2').style.display='flex';
+        const gw2 = document.getElementById('gameWrap');
+        if(gw2) gw2.style.visibility='hidden';
+      }
+    }, 500);
   }
 }
 function tryFullscreen() {
@@ -2041,19 +2051,17 @@ document.addEventListener('keydown',e=>{
            transition:border-color 0.12s,background 0.12s;min-width:80px;"
     onmouseover="this.style.borderColor='#3366aa';this.style.background='#0d2244';"
     onmouseout="this.style.borderColor='#1a3366';this.style.background='#0a1a33';">
-    <!-- Pixel speaker/music SVG — larger -->
-    <svg id="rotom-music-icon" width="32" height="32" viewBox="0 0 8 8"
-      style="image-rendering:pixelated;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+    <!-- Pixel speaker icon -->
+    <svg id="rotom-music-icon" width="clamp(18px,2.2vw,28px)" height="clamp(18px,2.2vw,28px)" viewBox="0 0 8 8"
+      style="image-rendering:pixelated;flex-shrink:0;width:clamp(18px,2.2vw,28px);height:clamp(18px,2.2vw,28px);" xmlns="http://www.w3.org/2000/svg">
       <rect x="1" y="3" width="2" height="2" fill="#4488ff"/>
       <polygon points="3,2 3,6 5,7 5,1" fill="#4488ff"/>
       <rect x="6" y="2" width="1" height="1" fill="#44aaff" id="rotom-wave1"/>
       <rect x="7" y="3" width="1" height="1" fill="#44aaff" id="rotom-wave2"/>
       <rect x="6" y="4" width="1" height="1" fill="#44aaff" id="rotom-wave3"/>
     </svg>
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1;">
-      <span style="font-size:clamp(9px,0.9vw,12px);color:rgba(100,160,255,0.9);letter-spacing:1px;">MUSIC</span>
-      <span id="rotom-widget-status" style="font-size:clamp(8px,0.75vw,11px);color:#3366aa;letter-spacing:1px;">OFF</span>
-    </div>
+    <!-- Single line: "MUSIC ON" or "MUSIC OFF" -->
+    <span id="rotom-widget-label" style="font-size:clamp(7px,0.75vw,11px);color:rgba(100,160,255,0.9);letter-spacing:1px;white-space:nowrap;">MUSIC <span id="rotom-widget-status" style="color:#3366aa;">OFF</span></span>
   </div>
 </div>
 
@@ -3310,7 +3318,7 @@ function _runFusionCore(cardA, cardB, rA, rB, allWraps, elA, elB) {
       border-radius:10px;overflow:hidden;background:#ffffff;
       border:2px solid rgba(50,70,140,0.8);
       box-shadow:0 8px 32px rgba(0,0,0,0.85);
-      will-change:transform,filter;z-index:3000;
+      will-change:transform,filter;z-index:9995;
       left:${cx-cw/2}px;top:${cy-ch/2}px;`;
     const dx = fromX - cx, dy = fromY - cy;
     el.style.transform = `translate(${dx}px,${dy}px) scale(0.75)`;
