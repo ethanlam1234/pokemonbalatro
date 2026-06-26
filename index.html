@@ -226,7 +226,7 @@ html { overflow: hidden; }
 }
 .hc:hover {
   transform: rotate(var(--tilt,0deg)) translateX(var(--dx,0px)) translateY(calc(var(--sel-ty,0px) + var(--dy,0px) - 6px)) scale(1.03) rotateX(var(--tilt3d-rx,0deg)) rotateY(var(--tilt3d-ry,0deg)) !important;
-  z-index:20 !important; box-shadow:0 10px 22px rgba(0,0,0,0.9);
+  z-index:100 !important; box-shadow:0 10px 22px rgba(0,0,0,0.9);
   transition:transform 0.08s ease, box-shadow 0.1s !important;
 }
 .hc-select-ring {
@@ -238,7 +238,7 @@ html { overflow: hidden; }
   border-color:rgba(100,160,255,0.5);
   box-shadow:0 0 0 1px rgba(80,140,255,0.3), 0 0 8px rgba(80,140,255,0.2);
 }
-.hc.selected-hand { --sel-ty:-22px; z-index:15 !important; }
+.hc.selected-hand { --sel-ty:-22px; }  /* z-index set per-card in makeHcEl/toggleHandSelect */
 /* ── ALWAYS-VISIBLE OPP HERO POWER CARD ── */
 .opp-hp-card {
   margin-top:6px;
@@ -2638,6 +2638,8 @@ function makeHcEl(card, i, isHidden) {
   el.style.setProperty('--tilt', tilt + 'deg');
   el.style.setProperty('--dx', '0px');
   el.style.setProperty('--dy', '0px');
+  // Position-aware z-index: base order preserved, selected cards lift above unselected
+  el.style.zIndex = G_selected.has(i) ? (50 + i) : (2 + i);
   if(G_selected.has(i)) el.classList.add('selected-hand');
   if(isHidden) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none'; }
   const art = document.createElement('img');
@@ -2698,16 +2700,19 @@ function toggleHandSelect(idx) {
 
   if(G_selected.has(idx)) {
     G_selected.delete(idx);
-    hcEls[idx]?.classList.remove('selected-hand');
+    const elD = hcEls[idx];
+    if(elD) { elD.classList.remove('selected-hand'); elD.style.zIndex = 2 + idx; }
     if(typeof SFX!=='undefined') SFX.cardDeselect();
   } else {
     if(G_selected.size >= 5) {
       const first = G_selected.values().next().value;
       G_selected.delete(first);
-      hcEls[first]?.classList.remove('selected-hand');
+      const elF = hcEls[first];
+      if(elF) { elF.classList.remove('selected-hand'); elF.style.zIndex = 2 + first; }
     }
     G_selected.add(idx);
-    hcEls[idx]?.classList.add('selected-hand');
+    const elA = hcEls[idx];
+    if(elA) { elA.classList.remove('selected-hand'); elA.classList.add('selected-hand'); elA.style.zIndex = 50 + idx; }
     if(typeof SFX!=='undefined') SFX.cardSelect();
   }
   // Update action bar without rebuilding hand DOM
