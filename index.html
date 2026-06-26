@@ -847,7 +847,7 @@ html { overflow: hidden; }
   position:fixed; inset:0; z-index:1500; display:none;
   flex-direction:column; align-items:center; justify-content:flex-start;
   padding:0;
-  background:rgba(4,6,18,0.88); overflow:hidden;
+  background:rgba(4,6,18,0.72); overflow:hidden;
   font-family:'PokemonClassic',monospace;
   pointer-events:all;
 }
@@ -1656,90 +1656,53 @@ void main(){
     return {c1:[r1,g1,b1], c2:mid, c3:[r3,g3,b3]};
   }
   const TRAINER_PALETTES = {
+    // Helper: c1=brightest highlight, c3=dark shadow
+    // Values are linear RGB 0-1
     // ── NORMAL TRAINERS ─────────────────────────────────────────
-    // Youngster — bright cheerful green, shorts energy
-    'Youngster':     mkP(0.30,0.75,0.20,  0.05,0.18,0.04),
-    // Lass — soft pastel pink, playful
-    'Lass':          mkP(0.90,0.45,0.65,  0.25,0.08,0.16),
-    // Bug Catcher — muddy olive green, forest floor
-    'Bug Catcher':   mkP(0.55,0.62,0.10,  0.12,0.16,0.02),
-    // Camper — warm khaki/orange, campfire
-    'Camper':        mkP(0.78,0.55,0.20,  0.22,0.13,0.04),
-    // Picnicker — sunny yellow-green, meadow
-    'Picnicker':     mkP(0.72,0.80,0.15,  0.16,0.20,0.03),
-    // Fisherman — deep sea teal, patient
-    'Fisherman':     mkP(0.10,0.60,0.65,  0.02,0.14,0.18),
-    // Sailor — navy blue with white caps
-    'Sailor':        mkP(0.15,0.35,0.80,  0.02,0.06,0.22),
-    // Hiker — rocky grey-brown, mountain stone
-    'Hiker':         mkP(0.60,0.52,0.40,  0.14,0.11,0.08),
-    // Bird Keeper — sky blue, aerial
-    'Bird Keeper':   mkP(0.40,0.72,0.95,  0.06,0.16,0.28),
-    // Engineer — cold steel blue, technical
-    'Engineer':      mkP(0.45,0.58,0.80,  0.08,0.10,0.22),
-    // Gambler — deep gold, fortune
-    'Gambler':       mkP(0.92,0.72,0.05,  0.28,0.18,0.01),
-    // Super Nerd — pale purple-blue, lab light
-    'Super Nerd':    mkP(0.55,0.48,0.85,  0.10,0.08,0.24),
-    // Scientist — cold clinical cyan
-    'Scientist':     mkP(0.20,0.88,0.82,  0.03,0.20,0.18),
-    // Burglar — dark smoky orange, flashlight beam
-    'Burglar':       mkP(0.85,0.40,0.05,  0.20,0.08,0.01),
-    // Juggler — bright circus purple-magenta
-    'Juggler':       mkP(0.82,0.18,0.72,  0.22,0.03,0.18),
-    // Channeler — deep eerie violet, ghost tower
-    'Channeler':     mkP(0.42,0.08,0.72,  0.08,0.01,0.18),
-    // Pokémaniac — deep collector purple
-    'Pokémaniac':    mkP(0.50,0.20,0.80,  0.10,0.03,0.22),
-    // Black Belt — crimson red, fighting spirit
-    'Black Belt':    mkP(0.85,0.08,0.08,  0.22,0.01,0.01),
-    // Tamer — warm amber, beast handler
-    'Tamer':         mkP(0.88,0.58,0.12,  0.24,0.12,0.02),
-    // Swimmer — bright aqua, sunlit water
-    'Swimmer':       mkP(0.05,0.78,0.90,  0.01,0.18,0.24),
-    // Cue Ball — raw grey-white, road tough
-    'Cue Ball':      mkP(0.70,0.68,0.65,  0.14,0.12,0.10),
-    // Rocket Grunt — Team Rocket grey-red
-    'Rocket Grunt':  mkP(0.70,0.08,0.08,  0.18,0.02,0.02),
+    'Youngster':      {c1:[0.22,0.62,0.14], c2:[0.10,0.35,0.07], c3:[0.03,0.10,0.02]},  // fresh green
+    'Lass':           {c1:[0.78,0.30,0.55], c2:[0.42,0.14,0.28], c3:[0.14,0.04,0.09]},  // rose pink
+    'Bug Catcher':    {c1:[0.48,0.52,0.08], c2:[0.24,0.28,0.04], c3:[0.07,0.09,0.01]},  // olive
+    'Camper':         {c1:[0.70,0.46,0.14], c2:[0.38,0.22,0.06], c3:[0.12,0.07,0.01]},  // warm khaki
+    'Picnicker':      {c1:[0.62,0.72,0.10], c2:[0.30,0.38,0.04], c3:[0.09,0.12,0.01]},  // sunny lime
+    'Fisherman':      {c1:[0.06,0.48,0.58], c2:[0.03,0.24,0.30], c3:[0.01,0.07,0.10]},  // sea teal
+    'Sailor':         {c1:[0.08,0.22,0.72], c2:[0.04,0.10,0.36], c3:[0.01,0.03,0.12]},  // deep navy
+    'Hiker':          {c1:[0.52,0.42,0.30], c2:[0.26,0.20,0.14], c3:[0.08,0.06,0.04]},  // stone brown
+    'Bird Keeper':    {c1:[0.28,0.60,0.90], c2:[0.12,0.30,0.48], c3:[0.03,0.09,0.16]},  // sky blue
+    'Engineer':       {c1:[0.30,0.45,0.72], c2:[0.14,0.22,0.36], c3:[0.04,0.06,0.12]},  // steel blue
+    'Gambler':        {c1:[0.88,0.66,0.04], c2:[0.44,0.32,0.02], c3:[0.14,0.10,0.00]},  // gold
+    'Super Nerd':     {c1:[0.40,0.32,0.78], c2:[0.20,0.16,0.40], c3:[0.06,0.05,0.13]},  // violet
+    'Scientist':      {c1:[0.14,0.80,0.76], c2:[0.06,0.40,0.38], c3:[0.02,0.12,0.12]},  // lab cyan
+    'Burglar':        {c1:[0.76,0.32,0.04], c2:[0.38,0.15,0.02], c3:[0.12,0.05,0.00]},  // burnt orange
+    'Juggler':        {c1:[0.72,0.14,0.64], c2:[0.36,0.06,0.32], c3:[0.11,0.02,0.10]},  // magenta
+    'Channeler':      {c1:[0.36,0.06,0.60], c2:[0.16,0.02,0.30], c3:[0.05,0.00,0.10]},  // ghost violet
+    'Pokémaniac':     {c1:[0.44,0.16,0.72], c2:[0.20,0.07,0.36], c3:[0.06,0.02,0.11]},  // collector purple
+    'Black Belt':     {c1:[0.76,0.06,0.06], c2:[0.38,0.03,0.03], c3:[0.12,0.01,0.01]},  // fighting red
+    'Tamer':          {c1:[0.80,0.50,0.10], c2:[0.40,0.24,0.04], c3:[0.12,0.07,0.01]},  // amber
+    'Swimmer':        {c1:[0.04,0.72,0.86], c2:[0.02,0.34,0.42], c3:[0.00,0.10,0.14]},  // bright aqua
+    'Cue Ball':       {c1:[0.60,0.56,0.52], c2:[0.28,0.26,0.24], c3:[0.08,0.07,0.07]},  // grey asphalt
+    'Rocket Grunt':   {c1:[0.64,0.06,0.06], c2:[0.30,0.02,0.02], c3:[0.10,0.00,0.00]},  // Team Rocket red
     // ── ELITE TRAINERS ──────────────────────────────────────────
-    // Ace Trainer — golden champion aura
-    'Ace Trainer':   mkP(0.95,0.78,0.10,  0.30,0.20,0.01),
-    // Cooltrainer — icy silver-blue, composed
-    'Cooltrainer':   mkP(0.55,0.72,0.90,  0.08,0.14,0.26),
-    // Veteran — deep bronze, weathered
-    'Veteran':       mkP(0.72,0.48,0.15,  0.20,0.12,0.03),
-    // Elite Scientist — harsh lab white-blue
-    'Elite Scientist':mkP(0.75,0.90,0.95, 0.10,0.18,0.24),
-    // Elite Psychic — deep magenta, third eye
-    'Elite Psychic': mkP(0.88,0.15,0.75,  0.22,0.02,0.20),
-    // Elite Black Belt — pure blood red
-    'Elite Black Belt':mkP(0.90,0.05,0.05, 0.25,0.01,0.01),
-    // Elite Breeder — warm egg-cream
-    'Elite Breeder': mkP(0.90,0.80,0.55,  0.25,0.18,0.08),
-    // Elite Executive — Team Rocket cold dark red
-    'Elite Executive':mkP(0.65,0.05,0.10, 0.15,0.01,0.02),
-    // ── GYM LEADERS ─────────────────────────────────────────────
-    // Brock — earthy brown rock
-    'Brock':         mkP(0.680,0.430,0.120, 0.14,0.08,0.01),
-    // Misty — deep ocean blue
-    'Misty':         mkP(0.050,0.520,0.900, 0.01,0.10,0.24),
-    // Lt. Surge — electric yellow-white
-    'Lt. Surge':     mkP(0.980,0.900,0.000, 0.28,0.22,0.00),
-    // Erika — rich forest green
-    'Erika':         mkP(0.140,0.720,0.160, 0.02,0.16,0.02),
-    // Koga — toxic purple
-    'Koga':          mkP(0.520,0.050,0.820, 0.12,0.01,0.20),
-    // Sabrina — psychic hot pink
-    'Sabrina':       mkP(0.950,0.100,0.620, 0.26,0.01,0.14),
-    // Blaine — volcanic fire orange-red
-    'Blaine':        mkP(0.960,0.300,0.000, 0.28,0.06,0.00),
-    // Giovanni — dark authority crimson
-    'Giovanni':      mkP(0.700,0.020,0.060, 0.18,0.00,0.01),
-    // ── DEFAULT (fallback) ───────────────────────────────────────
-    'default':       mkP(0.15,0.20,0.45, 0.03,0.04,0.12),
+    'Ace Trainer':    {c1:[0.88,0.70,0.08], c2:[0.44,0.34,0.03], c3:[0.14,0.10,0.00]},  // champion gold
+    'Cooltrainer':    {c1:[0.40,0.60,0.84], c2:[0.18,0.28,0.42], c3:[0.05,0.08,0.14]},  // cool blue-grey
+    'Veteran':        {c1:[0.60,0.40,0.12], c2:[0.28,0.18,0.05], c3:[0.09,0.06,0.01]},  // weathered bronze
+    'Elite Scientist':{c1:[0.60,0.82,0.88], c2:[0.28,0.40,0.44], c3:[0.08,0.12,0.14]},  // cold lab white
+    'Elite Psychic':  {c1:[0.80,0.12,0.68], c2:[0.38,0.05,0.32], c3:[0.12,0.01,0.10]},  // deep psychic
+    'Elite Black Belt':{c1:[0.82,0.04,0.04],c2:[0.40,0.02,0.02], c3:[0.13,0.00,0.00]},  // pure red
+    'Elite Breeder':  {c1:[0.84,0.74,0.46], c2:[0.40,0.34,0.20], c3:[0.12,0.10,0.06]},  // egg cream
+    'Elite Executive':{c1:[0.58,0.04,0.08], c2:[0.26,0.02,0.04], c3:[0.08,0.00,0.01]},  // executive dark red
+    // ── GYM LEADERS — very deliberate type colours ───────────────
+    'Brock':          {c1:[0.62,0.38,0.10], c2:[0.30,0.17,0.04], c3:[0.10,0.05,0.01]},  // rock brown
+    'Misty':          {c1:[0.04,0.46,0.88], c2:[0.02,0.20,0.44], c3:[0.00,0.06,0.14]},  // ocean blue
+    'Lt. Surge':      {c1:[0.94,0.88,0.00], c2:[0.48,0.44,0.00], c3:[0.14,0.12,0.00]},  // electric yellow
+    'Erika':          {c1:[0.10,0.66,0.12], c2:[0.04,0.32,0.05], c3:[0.01,0.10,0.01]},  // grass green
+    'Koga':           {c1:[0.46,0.04,0.72], c2:[0.20,0.02,0.34], c3:[0.06,0.00,0.10]},  // poison purple
+    'Sabrina':        {c1:[0.88,0.08,0.56], c2:[0.42,0.03,0.26], c3:[0.13,0.00,0.08]},  // psychic pink
+    'Blaine':         {c1:[0.92,0.26,0.00], c2:[0.46,0.12,0.00], c3:[0.14,0.03,0.00]},  // fire orange
+    'Giovanni':       {c1:[0.62,0.02,0.05], c2:[0.28,0.01,0.02], c3:[0.09,0.00,0.00]},  // dark crimson
+    'default':        {c1:[0.12,0.16,0.38], c2:[0.05,0.07,0.18], c3:[0.01,0.02,0.06]},  // neutral dark blue
   };
 
-  // Legacy index-based lookup kept for compatibility
+    // Legacy index-based lookup kept for compatibility
   const GYM_PALETTES = [
     TRAINER_PALETTES['Brock'], TRAINER_PALETTES['Misty'],
     TRAINER_PALETTES['Lt. Surge'], TRAINER_PALETTES['Erika'],
@@ -2160,7 +2123,7 @@ function nextCardImg() {
   return CARD_IMGS[k];
 }
 
-const FUSIONS = [{"name": "Hitmoking", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_107-hitmonchan_119-seaking_Hitmoking.png", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Koffdily", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_109-koffing_346-cradily_Koffdily.png", "baseAtk": 1, "baseHp": 2, "cost": 8, "baseTaunt": true}, {"name": "Koffaut", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_109-koffing_360-wynaut_Koffaut.png", "baseAtk": 1, "baseHp": 5, "cost": 6, "baseTaunt": true}, {"name": "Flarloud", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_136-flareon_295-exploud_Flarloud.png", "baseAtk": 6, "baseHp": 2, "cost": 8, "baseTaunt": false}, {"name": "Omanbird", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_138-omanyte_225-delibird_Omanbird.png", "baseAtk": 5, "baseHp": 2, "cost": 4, "baseTaunt": false}, {"name": "Kakemite", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_14-kakuna_81-magnemite_Kakemite.png", "baseAtk": 6, "baseHp": 8, "cost": 8, "baseTaunt": false}, {"name": "Mewytuff", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_150-mewtwo_40-wigglytuff_Mewytuff.png", "baseAtk": 4, "baseHp": 8, "cost": 7, "baseTaunt": false}, {"name": "Typhlsea", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_157-typhlosion_116-horsea_Typhlsea.png", "baseAtk": 1, "baseHp": 8, "cost": 2, "baseTaunt": true}, {"name": "Lantasaur", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_171-lanturn_1-bulbasaur_Lantasaur.png", "baseAtk": 6, "baseHp": 8, "cost": 5, "baseTaunt": false}, {"name": "Ivyssect", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_2-ivysaur_47-parasect_Ivyssect.png", "baseAtk": 1, "baseHp": 2, "cost": 2, "baseTaunt": true}, {"name": "Piloshop", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_221-piloswine_66-machop_Piloshop.png", "baseAtk": 1, "baseHp": 8, "cost": 8, "baseTaunt": true}, {"name": "Corsroth", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_222-corsola_288-vigoroth_Corsroth.png", "baseAtk": 5, "baseHp": 2, "cost": 7, "baseTaunt": false}, {"name": "Phastar", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_231-phanpy_139-omastar_Phastar.png", "baseAtk": 5, "baseHp": 8, "cost": 3, "baseTaunt": false}, {"name": "Smootres", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_238-smoochum_146-moltres_Smootres.png", "baseAtk": 5, "baseHp": 8, "cost": 1, "baseTaunt": false}, {"name": "Tyrantini", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_248-tyranitar_147-dratini_Tyrantini.png", "baseAtk": 3, "baseHp": 8, "cost": 4, "baseTaunt": false}, {"name": "Combuyama", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_256-combusken_297-hariyama_Combuyama.png", "baseAtk": 1, "baseHp": 5, "cost": 2, "baseTaunt": true}, {"name": "Sandschic", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_27-sandshrew_255-torchic_Sandschic.png", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Pelioom", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_279-pelipper_44-gloom_Pelioom.png", "baseAtk": 4, "baseHp": 5, "cost": 4, "baseTaunt": false}, {"name": "Shroochu", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_285-shroomish_172-pichu_Shroochu.png", "baseAtk": 7, "baseHp": 8, "cost": 2, "baseTaunt": false}, {"name": "Nincados", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_290-nincada_168-ariados_Nincados.png", "baseAtk": 3, "baseHp": 8, "cost": 3, "baseTaunt": false}, {"name": "Shedras", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_292-shedinja_46-paras_Shedras.png", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Nidoqitar", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_31-nidoqueen_246-larvitar_Nidoqitar.png", "baseAtk": 6, "baseHp": 5, "cost": 6, "baseTaunt": false}, {"name": "Clefkern", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_35-clefairy_191-sunkern_Clefkern.png", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Tropetchd", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_357-tropius_83-farfetchd_Tropetchd.png", "baseAtk": 5, "baseHp": 5, "cost": 1, "baseTaunt": false}, {"name": "Absgross", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_359-absol_376-metagross_Absgross.png", "baseAtk": 1, "baseHp": 5, "cost": 8, "baseTaunt": true}, {"name": "Cleffing", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_36-clefable_109-koffing_Cleffing.png", "baseAtk": 2, "baseHp": 8, "cost": 2, "baseTaunt": false}, {"name": "Regeavus", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_378-regice_200-misdreavus_Regeavus.png", "baseAtk": 6, "baseHp": 5, "cost": 3, "baseTaunt": false}, {"name": "Deoxys_duck", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_386-deoxys-normal_55-golduck_Deoxys_duck.png", "baseAtk": 1, "baseHp": 5, "cost": 2, "baseTaunt": true}, {"name": "Golzing", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_42-golbat_110-weezing_Golzing.png", "baseAtk": 2, "baseHp": 5, "cost": 1, "baseTaunt": false}, {"name": "Machqueen", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_68-machamp_31-nidoqueen_Machqueen.png", "baseAtk": 4, "baseHp": 5, "cost": 4, "baseTaunt": false}, {"name": "Weepiloud", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_70-weepinbell_295-exploud_Weepiloud.png", "baseAtk": 4, "baseHp": 2, "cost": 6, "baseTaunt": false}, {"name": "Tentaerain", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_72-tentacool_284-masquerain_Tentaerain.png", "baseAtk": 5, "baseHp": 5, "cost": 5, "baseTaunt": false}, {"name": "Tentalts", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_73-tentacruel_280-ralts_Tentalts.png", "baseAtk": 3, "baseHp": 2, "cost": 2, "baseTaunt": false}, {"name": "Magnearow", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_81-magnemite_21-spearow_Magnearow.png", "baseAtk": 6, "baseHp": 2, "cost": 7, "baseTaunt": false}, {"name": "Magnenine", "img": "https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_81-magnemite_59-arcanine_Magnenine.png", "baseAtk": 1, "baseHp": 5, "cost": 5, "baseTaunt": true},{"name":"Amphlord","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_181-ampharos_321-wailord_Amphlord.png","baseAtk":5,"baseHp":6,"cost":5,"baseTaunt":true},{"name":"Altafing","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_334-altaria_109-koffing_Altafing.png","baseAtk":3,"baseHp":4,"cost":3,"baseTaunt":false},{"name":"Makutail","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_296-makuhita_367-huntail_Makutail.png","baseAtk":4,"baseHp":3,"cost":3,"baseTaunt":false},{"name":"Medidum","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_308-medicham_374-beldum_Medidum.png","baseAtk":3,"baseHp":5,"cost":4,"baseTaunt":false},{"name":"Blisaldo","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_242-blissey_348-armaldo_Blisaldo.png","baseAtk":2,"baseHp":8,"cost":6,"baseTaunt":false},{"name":"Snubeep","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_209-snubbull_179-mareep_Snubeep.png","baseAtk":2,"baseHp":3,"cost":2,"baseTaunt":false},{"name":"Mr_mnea","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_122-mr-mime_331-cacnea_Mr_mnea.png","baseAtk":4,"baseHp":2,"cost":4,"baseTaunt":false},{"name":"Slowvyle","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_80-slowbro_253-grovyle_Slowvyle.png","baseAtk":3,"baseHp":5,"cost":4,"baseTaunt":false},{"name":"Regis_normal","img":"https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/fusions/final_379-registeel_386-deoxys-normal_Regis_normal.png","baseAtk":6,"baseHp":4,"cost":6,"baseTaunt":false}];
+const FUSIONS = [{"name": "Hitmoking", "img":"", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Koffdily", "img":"", "baseAtk": 1, "baseHp": 2, "cost": 8, "baseTaunt": true}, {"name": "Koffaut", "img":"", "baseAtk": 1, "baseHp": 5, "cost": 6, "baseTaunt": true}, {"name": "Flarloud", "img":"", "baseAtk": 6, "baseHp": 2, "cost": 8, "baseTaunt": false}, {"name": "Omanbird", "img":"", "baseAtk": 5, "baseHp": 2, "cost": 4, "baseTaunt": false}, {"name": "Kakemite", "img":"", "baseAtk": 6, "baseHp": 8, "cost": 8, "baseTaunt": false}, {"name": "Mewytuff", "img":"", "baseAtk": 4, "baseHp": 8, "cost": 7, "baseTaunt": false}, {"name": "Typhlsea", "img":"", "baseAtk": 1, "baseHp": 8, "cost": 2, "baseTaunt": true}, {"name": "Lantasaur", "img":"", "baseAtk": 6, "baseHp": 8, "cost": 5, "baseTaunt": false}, {"name": "Ivyssect", "img":"", "baseAtk": 1, "baseHp": 2, "cost": 2, "baseTaunt": true}, {"name": "Piloshop", "img":"", "baseAtk": 1, "baseHp": 8, "cost": 8, "baseTaunt": true}, {"name": "Corsroth", "img":"", "baseAtk": 5, "baseHp": 2, "cost": 7, "baseTaunt": false}, {"name": "Phastar", "img":"", "baseAtk": 5, "baseHp": 8, "cost": 3, "baseTaunt": false}, {"name": "Smootres", "img":"", "baseAtk": 5, "baseHp": 8, "cost": 1, "baseTaunt": false}, {"name": "Tyrantini", "img":"", "baseAtk": 3, "baseHp": 8, "cost": 4, "baseTaunt": false}, {"name": "Combuyama", "img":"", "baseAtk": 1, "baseHp": 5, "cost": 2, "baseTaunt": true}, {"name": "Sandschic", "img":"", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Pelioom", "img":"", "baseAtk": 4, "baseHp": 5, "cost": 4, "baseTaunt": false}, {"name": "Shroochu", "img":"", "baseAtk": 7, "baseHp": 8, "cost": 2, "baseTaunt": false}, {"name": "Nincados", "img":"", "baseAtk": 3, "baseHp": 8, "cost": 3, "baseTaunt": false}, {"name": "Shedras", "img":"", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Nidoqitar", "img":"", "baseAtk": 6, "baseHp": 5, "cost": 6, "baseTaunt": false}, {"name": "Clefkern", "img":"", "baseAtk": 7, "baseHp": 2, "cost": 3, "baseTaunt": false}, {"name": "Tropetchd", "img":"", "baseAtk": 5, "baseHp": 5, "cost": 1, "baseTaunt": false}, {"name": "Absgross", "img":"", "baseAtk": 1, "baseHp": 5, "cost": 8, "baseTaunt": true}, {"name": "Cleffing", "img":"", "baseAtk": 2, "baseHp": 8, "cost": 2, "baseTaunt": false}, {"name": "Regeavus", "img":"", "baseAtk": 6, "baseHp": 5, "cost": 3, "baseTaunt": false}, {"name": "Deoxys_duck", "img":"", "baseAtk": 1, "baseHp": 5, "cost": 2, "baseTaunt": true}, {"name": "Golzing", "img":"", "baseAtk": 2, "baseHp": 5, "cost": 1, "baseTaunt": false}, {"name": "Machqueen", "img":"", "baseAtk": 4, "baseHp": 5, "cost": 4, "baseTaunt": false}, {"name": "Weepiloud", "img":"", "baseAtk": 4, "baseHp": 2, "cost": 6, "baseTaunt": false}, {"name": "Tentaerain", "img":"", "baseAtk": 5, "baseHp": 5, "cost": 5, "baseTaunt": false}, {"name": "Tentalts", "img":"", "baseAtk": 3, "baseHp": 2, "cost": 2, "baseTaunt": false}, {"name": "Magnearow", "img":"", "baseAtk": 6, "baseHp": 2, "cost": 7, "baseTaunt": false}, {"name": "Magnenine", "img":"", "baseAtk": 1, "baseHp": 5, "cost": 5, "baseTaunt": true},{"name":"Amphlord","img":"","baseAtk":5,"baseHp":6,"cost":5,"baseTaunt":true},{"name":"Altafing","img":"","baseAtk":3,"baseHp":4,"cost":3,"baseTaunt":false},{"name":"Makutail","img":"","baseAtk":4,"baseHp":3,"cost":3,"baseTaunt":false},{"name":"Medidum","img":"","baseAtk":3,"baseHp":5,"cost":4,"baseTaunt":false},{"name":"Blisaldo","img":"","baseAtk":2,"baseHp":8,"cost":6,"baseTaunt":false},{"name":"Snubeep","img":"","baseAtk":2,"baseHp":3,"cost":2,"baseTaunt":false},{"name":"Mr_mnea","img":"","baseAtk":4,"baseHp":2,"cost":4,"baseTaunt":false},{"name":"Slowvyle","img":"","baseAtk":3,"baseHp":5,"cost":4,"baseTaunt":false},{"name":"Regis_normal","img":"","baseAtk":6,"baseHp":4,"cost":6,"baseTaunt":false}];
 
 // ── TRAINER ROSTER ─────────────────────────────────────────────
 // Trainer tiers: normal → elite → rival → gym leader (boss)
@@ -2487,7 +2450,9 @@ function initGame() {
   } else {
     G.deck = shuffle(FUSIONS.map(mkCard));
   }
-  G.theirDeck = shuffle(FUSIONS.map(mkCard));
+  // Build opponent deck from random basic Kanto pokemon (not old fusions)
+  const nonLeg2 = KANTO_POKEMON.filter(([d])=>!LEGENDARIES.has(d));
+  G.theirDeck = shuffle(nonLeg2.slice(0,40).map(([d])=>mkBasicCard(d)).filter(Boolean));
   G.ourBoard   = new Array(6).fill(null);
   G.theirBoard = new Array(4).fill(null);
   G.theirMana=1; G.theirMaxMana=1;
@@ -2495,7 +2460,7 @@ function initGame() {
   const firstTrainer=TRAINERS[0];
   G.trainerHp=firstTrainer.hp; G.trainerMaxHp=firstTrainer.hp;
   // Set initial gym color
-  if(window._balatroBg) window._balatroBg.setGym(0);
+  if(window._balatroBg) window._balatroBg.setTrainer('Youngster');
   setTimeout(()=>setTrainerPortrait(firstTrainer), 100);
   buildUI();
   renderAll();
@@ -2792,6 +2757,10 @@ async function discardSelected() {
   // Update discard display IMMEDIATELY — don't wait for animation
   const discEl = document.getElementById('rp-discards');
   if(discEl) discEl.textContent = G.discardsLeft;
+  // Safety watchdog: if animation gets stuck, reset after 4s
+  const _discardWatchdog = setTimeout(()=>{
+    if(G.animating){ G.animating=false; window._reflowAnimating=false; renderHand(); renderHandsPanel(); updateRunPanel(); }
+  }, 4000);
 
   const selectedIndices = Array.from(G_selected).sort((a,b) => a-b);
   const hcEls = [...document.querySelectorAll('#hand-container .hc')];
@@ -2824,6 +2793,7 @@ async function discardSelected() {
 
   // animateHandReflow handles: collapse → draw new cards → sort → slide all to positions
   await animateHandReflow(selectedIndices, () => {
+    clearTimeout(_discardWatchdog);
     G.animating = false;
     renderHandsPanel();
     updateRunPanel();
@@ -2892,36 +2862,35 @@ async function slideElsToPositions(els, targets, dur) {
 }
 
 // ── MAIN SEQUENCE: after discard/play ───────────────────────────
-// 1. Collapse removed cards
-// 2. Compute NEW full sorted hand (existing alive + cards from deck)
-// 3. Measure where all 8 cards will sit
-// 4. Existing cards slide to their new sorted positions
-// 5. New cards fly ghost arcs from deck to their sorted positions
-// All motions happen simultaneously → smooth Balatro-style refill
+// Key insight: the hand container ALWAYS measures positions as if 8 cards
+// are present (fixed width). Cards never collapse — they slide from where
+// they ARE to where they WILL BE once new cards are drawn.
 async function animateHandReflow(deadIndices, callback) {
   const hc = document.getElementById('hand-container');
   if(!hc){if(callback)callback();return;}
-
   window._reflowAnimating = true;
+  // Safety: if anything throws, always release the lock
+  try {
 
   const allEls = [...hc.querySelectorAll('.hc')];
   const deadSet = new Set(deadIndices);
-  const deadEls  = allEls.filter((_,i)=>deadSet.has(i));
   const aliveEls = allEls.filter((_,i)=>!deadSet.has(i));
 
-  // ── Step 1: collapse dead cards instantly ──────────────────────
-  deadEls.forEach(el=>{
-    el.style.cssText += ';width:0;min-width:0;margin:0;padding:0;overflow:hidden;opacity:0;transition:none;';
+  // ── Step 1: snapshot current pixel positions of ALL alive cards ──
+  // Do this BEFORE any DOM changes — these are the FROM positions
+  const cardToCx = new Map();
+  aliveEls.forEach(el=>{
+    if(el._card){
+      const r=el.getBoundingClientRect();
+      cardToCx.set(el._card, r.left+r.width/2);
+    }
   });
-  void hc.getBoundingClientRect();
 
-  // ── Step 2: figure out the full new hand after draw ────────────
-  // Remove dead cards from G.hand
+  // ── Step 2: update G.hand (remove dead, draw new, sort) ──────────
   const toRemove = deadIndices.slice().sort((a,b)=>b-a);
   toRemove.forEach(i=>{if(G.hand[i])G.hand.splice(i,1);});
   G_selected.clear(); _activeHandType=null;
 
-  // Draw new cards into G.hand
   const toDraw = Math.min(8-G.hand.length, G.deck.length);
   const newCards = [];
   for(let i=0;i<toDraw;i++){
@@ -2930,54 +2899,21 @@ async function animateHandReflow(deadIndices, callback) {
     G.hand.push(c);
     newCards.push(c);
   }
-
-  // Sort the full new hand
   G.hand.sort((a,b)=>sortKey(a).localeCompare(sortKey(b)));
 
-  // ── Step 3: measure where all 8 cards will sit ─────────────────
-  const slots = measureSlots(G.hand.length); // positions for every card
-  // slots[i] = where G.hand[i] should appear on screen
+  // ── Step 3: measure the FIXED 8-slot positions ───────────────────
+  // Always measure 8 slots so the hand width never changes regardless
+  // of how many cards are currently in the hand.
+  const FIXED_SLOTS = 8;
+  const allSlotPositions = measureSlots(FIXED_SLOTS);
+  // Map each card in G.hand to its slot position by index
+  // (hand is sorted; slots are left-to-right; centre the hand within 8 slots)
+  const offset = Math.floor((FIXED_SLOTS - G.hand.length) / 2);
+  const cardSlots = G.hand.map((_,i) => allSlotPositions[offset + i]);
 
-  // ── Step 4: match each alive DOM element to its new G.hand index ─
-  // aliveEls[j] was G.hand[aliveOriginalIndices[j]] — now we need to
-  // find where that card ended up in the sorted hand.
-  // We'll match by card object reference.
-  // Build a map: card → new sorted index
-  const cardToNewIdx = new Map(G.hand.map((c,i)=>[c,i]));
-
-  // For each alive el, find its card's new position
-  // aliveEls are the survivors (after dead removed), in original DOM order
-  // Their cards are the alive portion of the pre-splice G.hand
-  // We need to know which card each aliveEl represents.
-  // Since we already spliced G.hand, we can't look them up by index anymore.
-  // So we stored the card reference on the element — or we need another way.
-  // Solution: before splicing, we tagged alive els in discardSelected.
-  // Actually aliveEls were captured BEFORE splice. The alive cards are
-  // G.hand AFTER splice but BEFORE newCards were added, in their original order.
-  // After sort, we need to find each alive card's new index.
-  // We'll use the data stored in the DOM: each .hc has an img src we can match,
-  // or better: we store card ref on element.
-  // Simplest: rebuild all DOM elements from sorted G.hand in one go.
-  // But we need to animate FROM current positions TO new positions.
-
-  // Approach: renderHand(false) gives us clean sorted elements at final positions.
-  // FLIP: snapshot current positions, render, compute deltas, animate.
-
-  // Snapshot alive card positions by card object reference (reliable)
-  const cardToCx = new Map();
-  aliveEls.forEach(el=>{
-    if(el._card) {
-      const r=el.getBoundingClientRect();
-      cardToCx.set(el._card, r.left+r.width/2);
-    }
-  });
-
-  // ── Step 5: rebuild DOM — set FLIP offsets BEFORE first paint ──
-  // We use visibility:hidden on the container momentarily so the
-  // instant-reposition never flashes to the user.
+  // ── Step 4: rebuild DOM while hidden ─────────────────────────────
   hc.style.visibility = 'hidden';
   hc.innerHTML = '';
-  window._reflowAnimating = true;
 
   const allNewEls = G.hand.map((card,i)=>{
     const el = makeHcEl(card,i,false);
@@ -2985,49 +2921,43 @@ async function animateHandReflow(deadIndices, callback) {
     hc.appendChild(el);
     return el;
   });
-
-  // Force layout to get final positions while still hidden
   void hc.getBoundingClientRect();
 
-  // ── Step 6: Deck position (source of new cards) ───────────────
-  const deckEl = document.getElementById('deck-ours');
-  const deckRect = deckEl?.getBoundingClientRect();
-  const deckCx = deckRect ? deckRect.left+deckRect.width/2 : window.innerWidth-80;
-  const deckCy = deckRect ? deckRect.top+deckRect.height/2 : window.innerHeight*0.6;
+  // Deck pile position — source of new drawn cards
+  const _deckEl   = document.getElementById('deck-ours');
+  const _deckRect = _deckEl ? _deckEl.getBoundingClientRect() : null;
+  const deckCx = (_deckRect && _deckRect.width > 0) ? _deckRect.left + _deckRect.width/2  : window.innerWidth - 80;
+  const deckCy = (_deckRect && _deckRect.width > 0) ? _deckRect.top  + _deckRect.height/2 : window.innerHeight * 0.55;
 
-  // Separate existing vs new card elements
+  // Separate existing vs new
   const existingEls = allNewEls.filter((_,i)=>!newCards.includes(G.hand[i]));
   const newEls      = allNewEls.filter((_,i)=> newCards.includes(G.hand[i]));
 
-  // New cards stay invisible during phase 1
-  newEls.forEach(el=>{
-    el.style.opacity='0';
-    el.style.pointerEvents='none';
-  });
-
-  // Read final (target) positions for existing cards
+  // ── Step 5: read WHERE each card will end up (final positions) ────
   const existingFinals = existingEls.map(el=>{
     const r=el.getBoundingClientRect();
     return {cx:r.left+r.width/2, cy:r.top+r.height/2};
   });
 
-  // Apply FLIP offsets — cards start at their OLD positions
+  // ── Step 6: apply FLIP offsets — cards appear at their OLD positions ─
+  newEls.forEach(el=>{ el.style.opacity='0'; el.style.pointerEvents='none'; });
+
   existingEls.forEach((el,i)=>{
-    const card=G.hand[allNewEls.indexOf(el)];
+    const card = G.hand[allNewEls.indexOf(el)];
     const fromCx = cardToCx.get(card) ?? existingFinals[i].cx;
     const delta = fromCx - existingFinals[i].cx;
     const rng = (Math.random()-0.5)*3;
-    const tiltDeg = (delta > 0 ? 4 : delta < 0 ? -4 : 0) + rng;
+    const tiltDeg = (delta>0?4:delta<0?-4:0) + rng;
     el.style.setProperty('--dx', delta+'px');
     el.style.setProperty('--dy', '0px');
     el.style.setProperty('--slide-tilt', tiltDeg+'deg');
     el.style.transition='none';
   });
 
-  // NOW unhide — cards are already at their old visual positions via --dx
-  void hc.getBoundingClientRect();
-  hc.style.visibility = '';
+  // Unhide only after offsets are set — two rAFs to guarantee layout commit
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  hc.style.visibility = '';
+  await new Promise(r=>requestAnimationFrame(r));
 
   // Animate existing cards to final positions with motion tilt
   const P1_DUR=300, ease=t=>t<0.5?2*t*t:-1+(4-2*t)*t;
@@ -3143,6 +3073,13 @@ async function animateHandReflow(deadIndices, callback) {
 
   window._reflowAnimating = false;
   if(callback)callback();
+  } catch(err) {
+    console.error('[animateHandReflow] error:', err);
+    window._reflowAnimating = false;
+    if(callback)callback();
+    // Emergency re-render
+    try { renderHand(); } catch(e) {}
+  }
 }
 
 function autoFillHand(callback) {
@@ -3188,29 +3125,65 @@ function openCinnabarMansion() {
     wrap.addEventListener('click', () => {
       const alreadyIdx = _cinnabarSelected.indexOf(i);
       if(alreadyIdx >= 0) {
+        // Deselect
         _cinnabarSelected.splice(alreadyIdx, 1);
         wrap.classList.remove('cv-selected');
         if(typeof SFX!=='undefined') SFX.cardDeselect();
-      } else if(_cinnabarSelected.length < 2) {
-        // Prevent selecting the same Pokémon species twice
-        const existingCard = _cinnabarSelected.length > 0 ? show[_cinnabarSelected[0]] : null;
-        const sameSpecies = existingCard && (
-          (card.dexA && existingCard.dexA && card.dexA === existingCard.dexA) ||
-          (card.name && existingCard.name && card.name === existingCard.name)
-        );
-        if(sameSpecies) {
-          // Flash the card red briefly to indicate it's blocked
+        updateCinnabarPreview(show);
+        return;
+      }
+      if(_cinnabarSelected.length >= 2) return;
+
+      // First card — just select it
+      if(_cinnabarSelected.length === 0) {
+        _cinnabarSelected.push(i);
+        wrap.classList.add('cv-selected');
+        if(typeof SFX!=='undefined') SFX.cardSelect();
+        updateCinnabarPreview(show);
+        return;
+      }
+
+      // Second card — check species and sprite availability
+      const existingCard = show[_cinnabarSelected[0]];
+      const sameSpecies = existingCard && (
+        (card.dexA && existingCard.dexA && card.dexA === existingCard.dexA) ||
+        (card.name && existingCard.name && card.name === existingCard.name)
+      );
+      if(sameSpecies) {
+        wrap.style.transition='border-color 0.1s';
+        wrap.style.borderColor='rgba(255,60,60,0.9)';
+        setTimeout(()=>{ wrap.style.borderColor=''; }, 500);
+        if(typeof SFX!=='undefined') SFX.error();
+        return;
+      }
+
+      // Show loading state while we check sprite
+      wrap.style.opacity='0.6';
+      const nameA = existingCard.name;
+      const nameB = card.name;
+      checkFusionCached(nameA, nameB).then(result=>{
+        wrap.style.opacity='';
+        if(!result) {
+          // No sprite available — flash red
           wrap.style.transition='border-color 0.1s';
           wrap.style.borderColor='rgba(255,60,60,0.9)';
-          setTimeout(()=>{ wrap.style.borderColor=''; }, 500);
+          setTimeout(()=>{ wrap.style.borderColor=''; }, 600);
           if(typeof SFX!=='undefined') SFX.error();
-        } else {
-          _cinnabarSelected.push(i);
-          wrap.classList.add('cv-selected');
-          if(typeof SFX!=='undefined') SFX.cardSelect();
+          // Show a brief message
+          const msg = document.createElement('div');
+          msg.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(8,10,26,0.97);border:2px solid rgba(200,60,40,0.7);border-radius:8px;padding:12px 24px;font-family:PokemonClassic,monospace;font-size:clamp(8px,0.9vw,11px);color:#ff6655;letter-spacing:1px;z-index:9000;pointer-events:none;text-align:center;';
+          msg.textContent = 'NO FUSION SPRITE AVAILABLE';
+          document.body.appendChild(msg);
+          setTimeout(()=>msg.remove(), 1800);
+          return;
         }
-      }
-      updateCinnabarPreview(show);
+        // Sprite exists — store the confirmed URL and select
+        card._fusionSpriteUrl = result.url;
+        _cinnabarSelected.push(i);
+        wrap.classList.add('cv-selected');
+        if(typeof SFX!=='undefined') SFX.cardSelect();
+        updateCinnabarPreview(show);
+      }).catch(()=>{ wrap.style.opacity=''; });
     });
     row.appendChild(wrap);
   });
@@ -3232,14 +3205,21 @@ function buildFusedCard(a, b) {
   const fusedName = (aHalf + bHalf).replace(/[^a-zA-Z\-']/g,'');
   const traitsA = typeof getCardTraits==='function' ? getCardTraits(a) : [];
   const traitsB = typeof getCardTraits==='function' ? getCardTraits(b) : [];
+  // Use the confirmed sprite URL (checked during selection), or fall back to URL construction
+  const spriteUrl = b._fusionSpriteUrl || fusionSpriteUrls(a.name, b.name)[0];
+  // Both parents' primary types
+  const type1 = a.type1 || null;
+  const type2 = (b.type1 && b.type1 !== a.type1) ? b.type1 : (a.type2 || b.type2 || null);
   return {
-    name: fusedName, img: a.img, fusionImg: b.img,
+    name: fusedName,
+    img: spriteUrl,       // the fusion sprite IS the main image
+    fusionImg: spriteUrl,
     atk: Math.max(a.atk||1, b.atk||1),
     hp: (a.hp||2)+(b.hp||2), maxHp:(a.hp||2)+(b.hp||2),
     cost: Math.ceil(((a.cost||2)+(b.cost||2))/2),
     keywords:[...(a.keywords||[]),...(b.keywords||[])].slice(0,2),
     dexA:a.dexA, dexB:b.dexA,
-    type1:a.type1, type2:b.type1!==a.type1?b.type1:(b.type2||a.type2),
+    type1, type2,
     traitA:traitsA[0]||null, traitB:traitsB[0]||null,
     _isBonusCard:true, canAttack:false, exhausted:true, divineShieldUp:false,
     attacksLeft:0, frozen:false, stealthed:false,
@@ -3405,16 +3385,16 @@ function _runFusionCore(cardA, cardB, rA, rB, allWraps, elA, elB) {
       wA._img.style.transition = 'none';
       wA._img.style.filter = 'brightness(0) saturate(0)';
 
-      // Sequence of sprites to cycle through (A, B, A, B, A, B… then F)
-      // Each swap is instant (no flash — just img src change while black)
-      const sprites = [srcA, srcB, srcA, srcB, srcA, srcB, srcA, srcB, srcA, srcB, srcF];
-      const CYCLE_MS = 200; // how long each sprite shows while black
+      // Cycle: A → B → A → B → FUSION → A → B → FUSION (end)
+      // Include the fusion in the cycle so user sees all 3 as silhouettes
+      const sprites = [srcA, srcB, srcF, srcA, srcB, srcF, srcA, srcB, srcA, srcB, srcF];
+      const CYCLE_MS = 180; // how long each sprite shows while black
       let step = 0;
 
       function cycleSprite() {
         if(step >= sprites.length - 1) {
-          // Last one is fusion — reveal it in colour
-          evoReveal();
+          // Last one is fusion — preload then reveal in colour
+          preloadAndReveal();
           return;
         }
         step++;
@@ -3423,12 +3403,24 @@ function _runFusionCore(cardA, cardB, rA, rB, allWraps, elA, elB) {
         setTimeout(cycleSprite, CYCLE_MS);
       }
 
+      // Preload both parent sprites so cycle is glitch-free
+      [srcA, srcB].forEach(src=>{ if(src){ const i=new Image(); i.src=src; }});
       // Start cycling after a short settle
       setTimeout(cycleSprite, 300);
     }, 150);
   }
 
-  // ══ Reveal: transition from black silhouette to full colour ═
+  // ══ Reveal: preload fusion image then transition from black to colour ═
+  // This guarantees the fusion sprite is in browser cache before reveal
+  function preloadAndReveal() {
+    if(!srcF || srcF === srcA) { evoReveal(); return; }
+    const preload = new Image();
+    preload.crossOrigin = 'anonymous';
+    preload.onload = ()=>{ wA._img.src = srcF; evoReveal(); };
+    preload.onerror = ()=>{ evoReveal(); }; // still reveal even if load fails
+    preload.src = srcF;
+  }
+
   function getDominantColor(imgEl, callback) {
     // Load a fresh copy with crossOrigin to allow canvas sampling
     const src = imgEl.src || imgEl.currentSrc;
@@ -5755,8 +5747,8 @@ function setTrainerPortrait(trainer) {
   const tcEmoji=document.getElementById('tc-opp-hp-emoji'); if(tcEmoji) tcEmoji.textContent=trainer.hpEmoji||'⚔️';
   const tcHpName=document.getElementById('tc-opp-hp-name'); if(tcHpName) tcHpName.textContent=(trainer.hpName||'Power').toUpperCase();
   const tcHpDesc=document.getElementById('tc-opp-hp-desc'); if(tcHpDesc) tcHpDesc.textContent=trainer.hpDesc||'';
-  // Trigger gym color change
-  if(window._balatroBg) window._balatroBg.setGym(G.trainerIdx);
+  // Trigger per-trainer color change
+  if(window._balatroBg) window._balatroBg.setTrainer(trainer.name);
   updateRunPanel();
 }
 
@@ -6578,6 +6570,59 @@ const LEGENDARIES = new Set([144,145,146,150,151]);
 const KANTO_BY_DEX = {};
 KANTO_POKEMON.forEach(([d,n,t1,t2,hasEvo]) => { KANTO_BY_DEX[d] = {dex:d,name:n,type1:t1,type2:t2,hasEvo}; });
 
+
+// ══════════════════════════════════════════════════════════════
+// SPRITE-BASED FUSION SYSTEM
+// ══════════════════════════════════════════════════════════════
+
+// Normalise a pokémon name to match the GitHub folder/filename convention
+// e.g. "Farfetch'd" → "farfetchd", "Mr. Mime" → "mr-mime", "Nidoran-F" → "nidoran-f"
+function normPokeName(name) {
+  return name.toLowerCase()
+    .replace(/['.♂♀]/g, '')        // remove apostrophes, dots, gender symbols
+    .replace(/[\s-]+/g, '-')       // spaces and hyphens → single hyphen
+    .replace(/[^a-z0-9\-]/g, '')   // strip anything else
+    .replace(/-+/g, '-')            // collapse multiple hyphens
+    .replace(/^-|-$/g, '');         // trim leading/trailing hyphens
+}
+
+// Build the two candidate URLs for a fusion sprite
+// Convention: sprites/{parentA}/{parentA}_x_{parentB}.png
+function fusionSpriteUrls(nameA, nameB) {
+  const a = normPokeName(nameA);
+  const b = normPokeName(nameB);
+  const BASE = 'https://raw.githubusercontent.com/ethanlam1234/pokemonbalatro/main/sprites/';
+  return [
+    BASE + a + '/' + a + '_x_' + b + '.png',
+    BASE + b + '/' + b + '_x_' + a + '.png',
+  ];
+}
+
+// Check if a fusion sprite exists (HEAD request)
+// Tries both orderings and resolves to first found URL
+function checkFusionSprite(nameA, nameB) {
+  const [urlAB, urlBA] = fusionSpriteUrls(nameA, nameB);
+  // Try both in parallel for speed
+  const tryUrl = url => fetch(url, {method:'HEAD', cache:'force-cache'})
+    .then(r => r.ok ? url : null).catch(()=>null);
+  return Promise.all([tryUrl(urlAB), tryUrl(urlBA)]).then(([rAB, rBA])=>{
+    if(rAB) return {url:rAB, a:nameA, b:nameB};
+    if(rBA) return {url:rBA, a:nameB, b:nameA};
+    return null;
+  });
+}
+
+// Cache to avoid repeated HEAD requests
+const _fusionCache = {};
+function checkFusionCached(nameA, nameB) {
+  const key = [nameA,nameB].map(normPokeName).sort().join('|');
+  if(key in _fusionCache) return Promise.resolve(_fusionCache[key]);
+  return checkFusionSprite(nameA, nameB).then(result=>{
+    _fusionCache[key] = result;
+    return result;
+  });
+}
+
 // Make a card from a basic Kanto sprite (not a fusion)
 function mkBasicCard(dexNum) {
   const pk = KANTO_BY_DEX[dexNum];
@@ -6746,7 +6791,7 @@ function initStarterDeckScreen() {
   }, {once:true});
   document.body.classList.add('game-active');
   // Use Erika's grass palette for starter screen
-  if(window._balatroBg) window._balatroBg.setGym(3);
+  if(window._balatroBg) window._balatroBg.setTrainer('Erika');
   const screen = document.getElementById('starter-screen');
   if(!screen) return;
   screen.classList.remove('hidden','exiting');
@@ -7276,7 +7321,9 @@ function startNextBattle() {
   G.theirBoard = new Array(4).fill(null);
   G.ourTurn = true; G.animating = false; G.heroPowerUsed = false; G.ourMana = 10; G.maxMana = 10;
   G.hand = []; G.theirHand = [];
-  G.theirDeck = shuffle(FUSIONS.map(mkCard));
+  // Build opponent deck from random basic Kanto pokemon (not old fusions)
+  const nonLeg2 = KANTO_POKEMON.filter(([d])=>!LEGENDARIES.has(d));
+  G.theirDeck = shuffle(nonLeg2.slice(0,40).map(([d])=>mkBasicCard(d)).filter(Boolean));
   // Rebuild deck fresh each round from starter deck + bonuses
   const starterBase = G._starterDeckCards && G._starterDeckCards.length
     ? G._starterDeckCards.map(c=>({...c,id:Math.random().toString(36).slice(2)}))
