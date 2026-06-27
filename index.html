@@ -393,6 +393,7 @@ body.hand-dragging .hc,
 body.hand-dragging .hc.hc-floating {
   animation: none !important;
   pointer-events: none !important;
+  /* NO transform override here — _applySlide sets el.style.transform directly */
 }
 body.hand-dragging .hc:hover {
   transform: none !important;
@@ -580,7 +581,7 @@ body.hand-dragging .hc:hover {
 #item-popover.visible { opacity:1; }
 /* ── OWNED ITEMS panel (top-right) ── */
 #owned-items-panel {
-  position:fixed; top:56px; right:12px; z-index:111;
+  position:fixed; top:82px; right:12px; z-index:111;
   display:none; flex-direction:column; gap:5px; align-items:flex-end;
   max-width:clamp(160px,16vw,220px); pointer-events:all;
   font-family:'PokemonClassic',monospace;
@@ -1498,13 +1499,17 @@ body.hand-dragging .hc:hover {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    MOBILE — landscape phones/tablets (height ≤ 500px OR narrow landscape)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  #hand-container { bottom:clamp(50px,7vh,80px) !important; }
+}
+
 @media screen and (max-height: 520px),
        screen and (max-width: 960px) and (orientation: landscape) {
 
   /* ── Cards ── */
   .hc { width:clamp(68px,10.5vw,100px) !important; margin:0 -7px !important; }
   .hc.selected-hand { transform:rotate(var(--tilt,0deg)) translateY(-20px) scale(1.05) !important; }
-  #hand-container { bottom:clamp(90px,13vh,130px) !important; }
+  #hand-container { bottom:clamp(60px,8vh,90px) !important; }
 
   /* ── Bottom bar ── */
   #sort-label { font-size:9px !important; }
@@ -1569,6 +1574,7 @@ body.hand-dragging .hc:hover {
 
   /* ── Hands / Discards ── */
   #hd-row { bottom:8px !important; left:6px !important; gap:5px !important; }
+  #rotom-widget { position:fixed !important; bottom:8px !important; left:auto !important; top:auto !important; right:auto !important; left:calc(6px + 2*(clamp(70px,7vw,100px) + 10px) + 8px) !important; }
   .rp-hd-box  { padding:5px 9px !important; min-width:50px !important; border-radius:6px !important; }
   .rp-hd-val  { font-size:20px !important; }
   .rp-hd-label { font-size:7px !important; }
@@ -2187,15 +2193,15 @@ document.addEventListener('keydown',e=>{
     <span class="rp-hd-val" id="rp-hands">♥</span>
   </div>
   <div class="rp-hd-box discards">
-    <span class="rp-hd-label">Discards</span>
-    <span class="rp-hd-val" id="rp-discards">3</span>
+    <span class="rp-hd-label">Block</span>
+    <span class="rp-hd-val" id="rp-discards">0</span>
   </div>
 
 <!-- ── ROTOM RADIO WIDGET ── -->
 <!-- sits to the right of hd-row at same bottom position, managed by show/hideRotomRadio --></div><!-- /hd-row -->
 
 <!-- ── MUSIC TOGGLE BUTTON ── -->
-<div id="rotom-widget" style="display:none;position:fixed;z-index:200;top:12px;right:12px;font-family:'PokemonClassic',monospace;">
+<div id="rotom-widget" style="display:none;position:fixed;z-index:200;top:52px;right:12px;font-family:'PokemonClassic',monospace;">
   <div id="rotom-box" onclick="rotomToggle()" title="Toggle Music"
     style="border-radius:8px;padding:8px 14px;cursor:pointer;
            background:#0a1a33;border:2px solid #1a3366;
@@ -2513,6 +2519,7 @@ let G = {
   theirBoard:new Array(4).fill(null),
   ourMana:10, maxMana:10,
   ourTurn:true, animating:false,
+  ourBlock:0,
   drag:null, bcPending:null, heroPowerUsed:false, heroPowerCost:2,
   selectedHand:-1,
   trainerIdx:0,
@@ -2669,7 +2676,7 @@ function initGame() {
   G.deck = [];
   for(let _d=1;_d<=151;_d++){ const _c=mkBasicCard(_d); if(_c) G.deck.push(_c); }
   G.trainerHp = 99999; G.trainerMaxHp = 99999;
-  G.handsLeft = 99; G.discardsLeft = 9999;
+  G.handsLeft = 99; G.discardsLeft = 9999; G.ourBlock = 0;
   console.log('[TEST MODE] All 151 Pokémon loaded, 99999 HP, infinite discards');
   // ── END TEST MODE ──────────────────────────────────────────────
 
@@ -2822,8 +2829,10 @@ function makeHcEl(card, i, isHidden) {
   el.style.setProperty('--tilt', tilt + 'deg');
   el.style.setProperty('--dx', '0px');
   el.style.setProperty('--dy', '0px');
-  // Position-aware z-index: base order preserved, selected cards lift above unselected
-  el.style.zIndex = String(2 + i);
+  // First 5 cards are the "play hand" — raise them visually
+  const isPlayed = i < 5;
+  el.style.setProperty('--sel-ty', isPlayed ? '-18px' : '8px');
+  el.style.zIndex = String(isPlayed ? 10 + i : 2 + i);
   // No selection highlighting — cards played in order
   if(isHidden) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none'; }
   const art = document.createElement('img');
@@ -4016,7 +4025,7 @@ function showRotomRadio() {
     el.style.display='block';
     // Always top-right, above the items panel
     el.style.right  = '12px';
-    el.style.top    = '12px';
+    el.style.top    = '52px';
     el.style.left   = 'auto';
     el.style.bottom = 'auto';
     el.style.position = 'fixed';
@@ -7080,27 +7089,45 @@ function initHandDrag() {
   const hc = document.getElementById('hand-container');
   if(!hc || hc._hDragInited) return;
   hc._hDragInited = true;
+
   hc.addEventListener('pointerdown', e => {
     if(G.animating || !G.ourTurn) return;
     const cardEl = e.target.closest('.hc');
     if(!cardEl) return;
-    const sx=e.clientX, sy=e.clientY;
-    let started=false;
-    const doBegin=(cx,cy)=>{
+
+    // Capture the pointer so we get all subsequent events even outside the element
+    try { cardEl.setPointerCapture(e.pointerId); } catch(err){}
+
+    const sx = e.clientX, sy = e.clientY;
+    let started = false;
+
+    const doBegin = (cx, cy) => {
       if(started) return;
-      started=true;
-      clearTimeout(pt);
-      window.removeEventListener('pointermove',onM);
-      window.removeEventListener('pointerup',onU);
-      window.removeEventListener('pointercancel',onU);
-      beginHandDrag(cardEl,cx,cy);
+      started = true;
+      beginHandDrag(cardEl, cx, cy);
     };
-    const pt = setTimeout(()=>doBegin(sx,sy), 75);
-    const onM = me=>{ if(!started && Math.hypot(me.clientX-sx,me.clientY-sy)>6) doBegin(me.clientX,me.clientY); };
-    const onU = ()=>{ clearTimeout(pt); window.removeEventListener('pointermove',onM); };
-    window.addEventListener('pointermove',onM,{passive:true});
-    window.addEventListener('pointerup',onU,{once:true,passive:true});
-    window.addEventListener('pointercancel',onU,{once:true,passive:true});
+
+    // Start after 80ms hold OR 8px movement — whichever first
+    const pt = setTimeout(() => doBegin(sx, sy), 80);
+
+    const onMove = me => {
+      if(started) return;
+      if(Math.hypot(me.clientX - sx, me.clientY - sy) > 8) {
+        clearTimeout(pt);
+        doBegin(me.clientX, me.clientY);
+      }
+    };
+    const onUp = () => {
+      clearTimeout(pt);
+      cardEl.removeEventListener('pointermove', onMove);
+      cardEl.removeEventListener('pointerup',   onUp);
+      cardEl.removeEventListener('pointercancel', onUp);
+    };
+
+    // Listen on the CARD (not window) so pointer capture works on mobile
+    cardEl.addEventListener('pointermove', onMove);
+    cardEl.addEventListener('pointerup',   onUp,  {once:true});
+    cardEl.addEventListener('pointercancel', onUp, {once:true});
   });
 }
 
@@ -7111,34 +7138,27 @@ function beginHandDrag(cardEl, sx, sy) {
   const idx = els.indexOf(cardEl);
   if(idx < 0) return;
 
-  // Smooth deselect
-  els.forEach((el, i) => {
-    if(G_selected.has(i)) {
-      el.style.transition = 'transform 0.18s cubic-bezier(0.34,1.4,0.5,1)';
-      el.classList.remove('selected-hand');
-      el.style.removeProperty('--sel-ty');
-      el.style.zIndex = String(2 + i);
-    }
+  // Snapshot natural positions of ALL cards before anything changes
+  const naturalPos = els.map(el => {
+    const r = el.getBoundingClientRect();
+    el._slideDx = 0;
+    return { left: r.left, top: r.top, w: r.width, h: r.height };
   });
-  G_selected.clear();
-  updateActionBar();
 
-  // Snapshot unlifted rect
-  cardEl.classList.remove('selected-hand');
-  cardEl.style.removeProperty('--sel-ty');
-  void cardEl.offsetHeight;
-  const rect = cardEl.getBoundingClientRect();
-  const W = rect.width, H = rect.height;
+  const nat0 = naturalPos[idx];
+  const W = nat0.w, H = nat0.h;
 
-  // Ghost — never disappears, springs to slot on drop
+  // Ghost: full-fidelity floating card
   const ghost = document.createElement('div');
   ghost.style.cssText = [
-    'position:fixed', `left:${rect.left}px`, `top:${rect.top}px`,
+    'position:fixed',
+    `left:${nat0.left}px`, `top:${nat0.top}px`,
     `width:${W}px`, `height:${H}px`,
-    'z-index:9900','pointer-events:none','border-radius:8px','overflow:hidden',
-    'background:#fff','border:2px solid rgba(50,70,140,0.8)',
-    'box-shadow:0 22px 60px rgba(0,0,0,0.88),0 0 0 2px rgba(110,175,255,0.9),0 0 36px rgba(80,140,255,0.35)',
-    'transform:scale(1.05)','transform-origin:50% 80%','transition:none',
+    'z-index:9900', 'pointer-events:none',
+    'border-radius:8px', 'overflow:hidden',
+    'background:#fff', 'border:2px solid rgba(50,70,140,0.8)',
+    'box-shadow:0 28px 64px rgba(0,0,0,0.92),0 0 0 2px rgba(110,175,255,0.95),0 0 40px rgba(80,140,255,0.4)',
+    'transform:scale(1.06)', 'transform-origin:50% 80%', 'transition:none',
   ].join(';');
   const srcArt = cardEl.querySelector('.hc-art');
   if(srcArt) {
@@ -7151,87 +7171,90 @@ function beginHandDrag(cardEl, sx, sy) {
   if(srcBadge) ghost.appendChild(srcBadge.cloneNode(true));
   document.body.appendChild(ghost);
 
-  // Collapse slot width → hand closes the gap smoothly
-  cardEl.style.transition = 'width 0.16s cubic-bezier(0.4,0,0.2,1), margin 0.16s cubic-bezier(0.4,0,0.2,1), opacity 0.1s ease';
+  // Slot card: invisible, keeps full width — layout unchanged
   cardEl.style.visibility = 'hidden';
-  cardEl.style.opacity    = '0';
-  cardEl.style.overflow   = 'hidden';
-  requestAnimationFrame(() => {
-    cardEl.style.width  = '0px';
-    cardEl.style.margin = '0';
-  });
 
   _hDrag = {
     cardEl, ghost, idx, insertIdx: idx,
-    offsetX: sx - rect.left, offsetY: sy - rect.top,
+    offsetX: sx - nat0.left, offsetY: sy - nat0.top,
     prevX: sx, vx: 0,
     cardW: W, cardH: H,
-    slotLeft: rect.left, slotTop: rect.top,
+    naturalPos,
+    cardSides: null,
   };
 
-  window.addEventListener('pointermove', onHandDragMove, {passive:false});
-  window.addEventListener('pointerup',   onHandDragEnd,  {once:true, passive:true});
-  window.addEventListener('pointercancel', onHandDragEnd, {once:true, passive:true});
+  // Listen on window with passive:false so we can preventDefault on mobile
+  window.addEventListener('pointermove',   onHandDragMove, {passive:false});
+  window.addEventListener('pointerup',     onHandDragEnd,  {once:true});
+  window.addEventListener('pointercancel', onHandDragEnd,  {once:true});
   document.body.classList.add('hand-dragging');
   if(typeof SFX !== 'undefined') SFX.deckClick();
+
+  // Apply initial slide immediately (open gap at current position)
+  _applySlide(els, _hDrag, idx);
 }
 
 function onHandDragMove(e) {
   if(!_hDrag) return;
-  e.preventDefault && e.preventDefault();
-  const d = _hDrag, cx = e.clientX, cy = e.clientY;
+  e.preventDefault(); // critical on mobile — prevents scroll
+  const d = _hDrag;
+  const cx = e.clientX, cy = e.clientY;
 
   d.vx = (cx - d.prevX) * 0.6 + d.vx * 0.4;
   d.prevX = cx;
 
+  // Ghost follows finger/pointer
   const tilt = Math.max(-15, Math.min(15, d.vx * 0.3));
   d.ghost.style.left      = (cx - d.offsetX) + 'px';
   d.ghost.style.top       = (cy - d.offsetY) + 'px';
   d.ghost.style.transform = `scale(1.07) rotate(${tilt}deg)`;
   d.ghost.style.transition = 'transform 0.07s ease';
 
-  // Insertion: count how many visible cards have their natural centre left of ghost
   const hc  = document.getElementById('hand-container');
   const els = [...hc.querySelectorAll('.hc')];
   const ghostCx = cx - d.offsetX + d.cardW * 0.5;
 
-  // Hysteresis: use different entry/exit thresholds based on direction
-  // This creates a dead zone that stops jitter at the boundary.
+  // Init committed sides once
+  if(!d.cardSides) {
+    d.cardSides = new Map();
+    let li = 0;
+    els.forEach(el => {
+      if(el === d.cardEl) return;
+      d.cardSides.set(el, li++ < d.idx ? 'left' : 'right');
+    });
+  }
+
+  // Count how many non-slot cards belong to the right group
+  // Uses natural positions (never change) → hysteresis is perfectly stable
   let ins = 0;
-  els.forEach(el => {
+  els.forEach((el, domI) => {
     if(el === d.cardEl) return;
-    const r = el.getBoundingClientRect();
-    const slideOff = parseFloat(el.style.getPropertyValue('--slide-dx') || '0') || 0;
-    const natLeft  = r.left - slideOff;
-    // Moving right: card joins right group at 42% — snappy
-    // Moving left:  card exits right group at 58% — needs clear intent
-    const movingRight = (d.vx >= 0);
-    const frac = movingRight ? 0.42 : 0.58;
-    if(ghostCx > natLeft + r.width * frac) ins++;
+    const nat     = d.naturalPos[domI];
+    const natLeft = nat.left;
+    const natW    = nat.w;
+    const side    = d.cardSides.get(el) || 'right';
+    // 20% dead zone: cross 60% to enter right, cross 40% to re-enter left
+    if(side === 'left'  && ghostCx > natLeft + natW * 0.60) d.cardSides.set(el, 'right');
+    if(side === 'right' && ghostCx < natLeft + natW * 0.40) d.cardSides.set(el, 'left');
+    if(d.cardSides.get(el) === 'right') ins++;
   });
   ins = Math.max(0, Math.min(ins, els.length - 1));
 
-  if(ins !== d.insertIdx) {
-    d.insertIdx = ins;
-    _applySlide(els, d.cardW, ins);
-  }
+  if(ins !== d.insertIdx) d.insertIdx = ins;
+  _applySlide(els, d, ins);
 }
 
-// Split hand at insertion point: left half shifts left, right half shifts right.
-// Uses direct style.transform (not CSS vars) to bypass animation interference.
-function _applySlide(els, cardW, ins) {
-  const half = Math.round((cardW - 24) * 0.65); // ~55px each side = ~110px total gap
+function _applySlide(els, d, ins) {
+  const half = Math.round((d.cardW - 24) * 0.65);
   let logIdx = 0;
-  els.forEach(el => {
-    if(el === _hDrag?.cardEl) return;
-    const dx = logIdx < ins ? -half : half;
-    // Also set the CSS var for landing-position calculation
-    el.style.setProperty('--slide-dx', dx + 'px');
-    // Direct transform overrides animation and hover
-    const tilt = parseFloat(el.style.getPropertyValue('--tilt') || '0');
-    const mTilt= parseFloat(el.style.getPropertyValue('--motion-tilt') || '0');
-    el.style.transform = `rotate(${tilt+mTilt}deg) translateX(${dx}px)`;
-    el.style.transition = 'transform 0.13s cubic-bezier(0.25,1.5,0.5,1)';
+  els.forEach((el, domI) => {
+    if(el === d.cardEl) return;
+    const dx    = logIdx < ins ? -half : half;
+    const selTy = parseFloat(el.style.getPropertyValue('--sel-ty') || '0');
+    const tiltr = parseFloat(el.style.getPropertyValue('--tilt')   || '0');
+    el.style.transform  = `rotate(${tiltr}deg) translateX(${dx}px) translateY(${selTy}px)`;
+    el.style.transition = 'transform 0.12s cubic-bezier(0.25,1.5,0.5,1)';
+    el._slideDx = dx;
     logIdx++;
   });
 }
@@ -7239,73 +7262,56 @@ function _applySlide(els, cardW, ins) {
 function onHandDragEnd() {
   if(!_hDrag) return;
   window.removeEventListener('pointermove', onHandDragMove);
-  const d = _hDrag;
-  _hDrag  = null;
+  const d   = _hDrag;
+  _hDrag    = null;
   document.body.classList.remove('hand-dragging');
 
-  const hc  = document.getElementById('hand-container');
-  const els = [...hc.querySelectorAll('.hc')];
+  const hc   = document.getElementById('hand-container');
   const from = d.idx;
   const to   = Math.max(0, Math.min(d.insertIdx, G.hand.length - 1));
+  const els  = [...hc.querySelectorAll('.hc')];
 
-  // Find landing position: centre of the gap between left and right card clusters
-  let landX = d.slotLeft, landY = d.slotTop;
-  const half_land = Math.round((d.cardW - 24) * 0.6);
-  let leftEdge = null, rightEdge = null, refTop = d.slotTop;
-  let visIdx = 0;
+  // Compute step from natural positions
+  const natXs = d.naturalPos
+    .filter((p, i) => i !== from && p)
+    .map(p => p.left)
+    .sort((a, b) => a - b);
+  const step = natXs.length > 1
+    ? (natXs[natXs.length-1] - natXs[0]) / (natXs.length - 1)
+    : d.cardW;
+
+  // FLIP inversion: each card goes from current visual position → final natural position
+  let li = 0;
+  els.forEach((el, domI) => {
+    if(el === d.cardEl) return;
+    const oldLog  = li++;
+    const nat     = d.naturalPos[domI];
+    if(!nat) return;
+    const selTy   = parseFloat(el.style.getPropertyValue('--sel-ty') || '0');
+    const tiltr   = parseFloat(el.style.getPropertyValue('--tilt')   || '0');
+    const curDx   = el._slideDx || 0;     // where it visually is
+    let   finalShift = 0;
+    if(from < to && oldLog >= from && oldLog < to) finalShift = -step;
+    if(from > to && oldLog >= to   && oldLog < from) finalShift = +step;
+    const invertDx = curDx - finalShift;  // push to current visual position
+    el.style.transition = 'none';
+    el.style.transform  = `rotate(${tiltr}deg) translateX(${invertDx}px) translateY(${selTy}px)`;
+    el._slideDx = invertDx;
+  });
+
+  void hc.offsetHeight; // force reflow
+
+  // Animate all cards to final natural positions
   els.forEach(el => {
     if(el === d.cardEl) return;
-    const r = el.getBoundingClientRect();
-    refTop = r.top;
-    if(visIdx < to) {
-      // Last card on the left side — its natural right edge
-      const slideOff = parseFloat(el.style.getPropertyValue('--slide-dx') || '0') || 0;
-      leftEdge = (r.left - slideOff) + r.width;
-    } else if(rightEdge === null) {
-      // First card on the right side — its natural left edge
-      const slideOff = parseFloat(el.style.getPropertyValue('--slide-dx') || '0') || 0;
-      rightEdge = r.left - slideOff;
-    }
-    visIdx++;
-  });
-  landY = refTop;
-  if(leftEdge !== null && rightEdge !== null) {
-    // Centre of gap minus half the card width to position ghost centred in gap
-    landX = (leftEdge + rightEdge) / 2 - d.cardW / 2;
-  } else if(rightEdge !== null) {
-    landX = rightEdge;          // inserting at start
-  } else if(leftEdge !== null) {
-    landX = leftEdge - d.cardW; // inserting at end
-  }
-
-  // Spring ghost to slot position, then it snaps invisible
-  d.ghost.style.transition = [
-    'left 0.2s cubic-bezier(0.4,0,0.2,1)',
-    'top 0.2s cubic-bezier(0.4,0,0.2,1)',
-    'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
-    'opacity 0.08s ease 0.18s',
-  ].join(',');
-  d.ghost.style.left      = landX + 'px';
-  d.ghost.style.top       = landY + 'px';
-  d.ghost.style.transform = 'scale(1) rotate(0deg)';
-  d.ghost.style.opacity   = '0';
-
-  // Clear all direct slide transforms immediately — no spring back.
-  // We DON'T reset --slide-dx to 0 first (that causes the close-then-reopen).
-  // Instead just strip the inline transform so the card is layout-neutral,
-  // then renderHand() immediately places everything at the right final positions.
-  els.forEach(el => {
-    el.style.transform  = '';      // remove direct override, no transition
-    el.style.transition = 'none';  // instant — renderHand will re-apply transitions
-    el.style.setProperty('--slide-dx', '0px');
-    el.style.removeProperty('--sel-ty');
+    const selTy = parseFloat(el.style.getPropertyValue('--sel-ty') || '0');
+    const tiltr = parseFloat(el.style.getPropertyValue('--tilt')   || '0');
+    el.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1)';
+    el.style.transform  = `rotate(${tiltr}deg) translateX(0px) translateY(${selTy}px)`;
+    el._slideDx = 0;
   });
 
-  // Restore slot card to full width immediately (no transition) so
-  // renderHand measures it correctly.
-  ['visibility','opacity','overflow','transition','width','margin'].forEach(p => d.cardEl.style.removeProperty(p));
-
-  // Reorder G.hand data
+  // Reorder G.hand
   if(from !== to) {
     const selCards = new Set(Array.from(G_selected).map(i => G.hand[i]).filter(Boolean));
     const [card] = G.hand.splice(from, 1);
@@ -7314,14 +7320,17 @@ function onHandDragEnd() {
     if(typeof SFX !== 'undefined') SFX.confirm();
   }
 
-  // renderHand immediately — cards snap to final positions, no intermediate state
-  renderHand();
-  if(typeof renderHandsPanel === 'function') renderHandsPanel();
-  updateActionBar();
+  // Ghost fades out
+  d.ghost.style.transition = 'opacity 0.15s ease';
+  d.ghost.style.opacity    = '0';
+  setTimeout(() => d.ghost.remove(), 180);
 
-  // Ghost springs to landing position then disappears
-  // (happens in parallel — ghost fades out as real card appears)
-  setTimeout(() => d.ghost.remove(), 230);
+  // Rebuild DOM after animation completes
+  setTimeout(() => {
+    renderHand();
+    if(typeof renderHandsPanel === 'function') renderHandsPanel();
+    updateActionBar();
+  }, 320);
 }
 function slideHandPreview(){}
 
@@ -7410,6 +7419,11 @@ function applyStatus(effect, val, source) {
 // Process status effects at end of turn (poison/burn tick)
 
 // Opponent pokemon counter-attacks the player
+function _updateBlockDisplay() {
+  const el = document.getElementById('rp-discards');
+  if(el) el.textContent = G.ourBlock || 0;
+}
+
 async function oppPokemonAttack() {
   if(!G.oppPokemon) return;
   const dex   = parseInt(G.oppPokemon.dexA || G.oppPokemon.dexNum) || 1;
@@ -7465,20 +7479,28 @@ async function oppPokemonAttack() {
   document.body.appendChild(flash);
   setTimeout(()=>{flash.style.opacity='0';setTimeout(()=>flash.remove(),400);},100);
 
-  // Apply damage to player (using G.ourHp or just show it)
-  G.ourHp = Math.max(0, (G.ourHp||100) - atk);
-  // Damage number floats up at bottom center
+  // Block absorbs damage before HP
+  const block = G.ourBlock || 0;
+  let blocked = Math.min(block, atk);
+  let dmgToHp = atk - blocked;
+  G.ourBlock = Math.max(0, block - atk); // block depletes by damage taken
+  if(blocked > 0) {
+    floatLabel(null, `BLOCK -${blocked}`, '#66AAFF', 'clamp(9px,1vw,12px)', 700);
+    _updateBlockDisplay();
+  }
+  if(dmgToHp > 0) {
+    G.ourHp = Math.max(0, (G.ourHp||100) - dmgToHp);
+  }
+  // Damage number — show blocked vs actual damage
   const dmgEl = document.createElement('div');
   dmgEl.style.cssText = `position:fixed;left:${dstX}px;top:${dstY-20}px;
     font-family:'PokemonClassic',monospace;font-weight:bold;
-    font-size:clamp(20px,2.8vw,44px);color:#ff4444;
+    font-size:clamp(20px,2.8vw,44px);color:${dmgToHp>0?'#ff4444':'#66aaff'};
     text-shadow:2px 2px 0 #000;z-index:8900;pointer-events:none;
     transform:translateX(-50%);animation:floatDmg 1.2s ease forwards;`;
-  dmgEl.textContent = '-'+atk;
+  dmgEl.textContent = dmgToHp > 0 ? '-'+dmgToHp : 'BLOCKED';
   document.body.appendChild(dmgEl);
   setTimeout(()=>dmgEl.remove(),1300);
-
-  // Update health display
   const handsEl = document.getElementById('rp-hands');
   if(handsEl) handsEl.textContent = G.ourHp;
 
@@ -7834,11 +7856,22 @@ async function playSelectedHand() {
     const origIdx = selectedIndices[selectedCards.indexOf(card)];
     const el = hcEls[origIdx];
     const move = getMove(card);
-    if(el) { el.style.pointerEvents='none'; }
+    if(el) {
+      el.style.pointerEvents = 'none';
+      const tilt = parseFloat(el.style.getPropertyValue('--tilt') || '0');
+      // Smooth uplift before firing the move
+      el.style.transition = 'transform 0.2s cubic-bezier(0.34,1.4,0.5,1)';
+      el.style.transform  = `rotate(${tilt}deg) translateY(-30px) scale(1.07)`;
+      await delay(170);
+    }
     await playMoveAnimation(card, el, move);
-    // Ensure no leftover transform/filter from animation
-    if(el) { el.style.transform=''; el.style.filter=''; el.style.opacity=''; }
-    await delay(100);
+    if(el) {
+      const tilt = parseFloat(el.style.getPropertyValue('--tilt') || '0');
+      el.style.transition = 'transform 0.16s cubic-bezier(0.4,0,0.2,1)';
+      el.style.transform  = `rotate(${tilt}deg) translateY(0px)`;
+      setTimeout(() => { el.style.transform=''; el.style.transition=''; el.style.filter=''; el.style.opacity=''; }, 180);
+    }
+    await delay(80);
   }
 
   // Deal damage
@@ -7873,12 +7906,13 @@ async function playSelectedHand() {
     if(G.oppPokemonsLeft > 0) pickOppPokemon();
     else { setTimeout(advanceTrainer, 500); return; }
   } else if(G.oppPokemonHp > 0) {
-    // Opp pokemon survived — it counter-attacks us!
-    await delay(400);
-    await oppPokemonAttack();
+    // Turn resolution: 1) Status effects tick, 2) Opp attacks (reduced by block), 3) Block resets
+    processOppStatus();     // poison/burn tick on opp
+    await delay(300);
+    await oppPokemonAttack(); // opp hits us (block absorbs damage)
+    G.ourBlock = 0;          // block resets each round
+    _updateBlockDisplay();
   }
-  // Tick status effects
-  processOppStatus();
 
   if(G.trainerHp <= 0) {
     // Remove played cards then advance
