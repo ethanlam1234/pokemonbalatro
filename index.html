@@ -1185,7 +1185,7 @@ body.hand-dragging .hc:hover {
 .hc-move-desc {
   position:absolute;
   bottom:0; left:0; right:0;
-  padding:6px 8px 6px;
+  padding:6px 8px 7px;
   font-family:'PokemonClassic',monospace;
   font-size:clamp(10px,0.95vw,13px);
   color:#111;
@@ -1195,17 +1195,18 @@ body.hand-dragging .hc:hover {
   letter-spacing:0;
   z-index:4;
   word-break:break-word;
-  overflow:visible;
+  height:auto;
 }
 .hc .hc-art {
   position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%, -50%);
-  height:62%;
+  /* top/height set dynamically by positionCardArt() after render */
+  left:50%;
+  transform:translateX(-50%);
   width:auto;
   max-width:88%;
+  display:block;
   object-fit:contain; image-rendering:pixelated;
-  background:transparent; padding:0; display:block; z-index:3;
+  background:transparent; padding:0; z-index:3;
 }
 .hc .hc-name {
   font-family:'PokemonClassic',monospace; font-size:clamp(10px, 1.01vw, 15px);
@@ -1581,7 +1582,7 @@ body.hand-dragging .hc:hover {
   /* ── Cards ── */
   .hc { width:clamp(100px, 14.5vw, 150px) !important; margin:0 -10px !important; }
   .hc.selected-hand { transform:rotate(var(--tilt,0deg)) translateY(-20px) scale(1.05) !important; }
-  #hand-container { bottom:clamp(65px, 9.0vh, 110px) !important; }
+  #hand-container { bottom:clamp(15px, 2.0vh, 30px) !important; }
 
   /* ── Bottom bar ── */
   #sort-label { font-size:9px !important; }
@@ -1590,6 +1591,8 @@ body.hand-dragging .hc:hover {
   #action-row { gap:4px !important; padding:3px 8px 7px !important; }
   #sort-row   { padding:2px 8px !important; }
 
+  .hc-move-desc { font-size:clamp(7px,0.65vw,8px) !important; padding:3px 4px !important; }
+  .hc-type1, .hc-type2 { font-size:6px !important; padding:1px 3px !important; }
   /* ── Left panel ── */
   #run-panel  { width:clamp(110px, 20.0vw, 150px) !important; gap:4px !important; left:6px !important; top:6px !important; }
   #rp-hand-preview { display:none !important; }
@@ -1599,6 +1602,9 @@ body.hand-dragging .hc:hover {
   .opp-stat-val { font-size:clamp(11px,1.1vw,14px) !important; }
   .opp-stat-label { font-size:clamp(5px,0.5vw,7px) !important; }
   #opp-pokemon-hp-strip { display:flex !important; }
+  /* On mobile, hide trainer portrait image, show just the stat overlay */
+  #rp-portrait-img-wrap { display:none !important; }
+  #rp-portrait-overlay { border-radius:8px !important; border:2px solid rgba(50,70,140,0.5) !important; }
   /* Show opp HP in run-panel on mobile */
   #mobile-opp-hp { display:block !important; margin-top:4px; }
   /* Hide the opp HP strip from centre-screen on mobile (it's now in run-panel) */
@@ -2882,6 +2888,7 @@ function initGame() {
         // Sort hand by current sort mode on each card addition
         G.hand.sort((a,b)=>(a.type1||'zzz').localeCompare(b.type1||'zzz')||((parseInt(a.dexA)||0)-(parseInt(b.dexA)||0))); // always type sort
         renderHand(true);
+        setTimeout(positionAllCardArts, 40);
       }
     }, 150+i*180);
     setTimeout(()=>{ if(G.theirDeck.length){G.theirHand.push({...G.theirDeck.shift()});renderOppHand(true);} }, 150+i*180);
@@ -3021,6 +3028,31 @@ const ARC_COLORS = {
   POS:     '#336688',  // steel blue
   GOLD:    '#998800',  // olive gold
 };
+
+// Position the pokemon art image dynamically between badge and desc
+function positionCardArt(el) {
+  const card = el.getBoundingClientRect();
+  if(!card.height) return; // not in DOM yet
+  const art  = el.querySelector('.hc-art');
+  const badge = el.querySelector('.hc-type1');
+  const desc  = el.querySelector('.hc-move-desc');
+  if(!art) return;
+  const badgeH = badge ? badge.getBoundingClientRect().height + 5 : 5;
+  const descH  = desc  ? desc.getBoundingClientRect().height  + 4 : 0;
+  const totalH = card.height;
+  const zoneTop = badgeH;
+  const zoneBot = totalH - descH;
+  const zoneH   = zoneBot - zoneTop;
+  const artH    = Math.floor(zoneH * 0.88); // fill 88% of the zone
+  const artTop  = zoneTop + (zoneH - artH) / 2; // center in zone
+  art.style.top    = Math.round(artTop) + 'px';
+  art.style.height = Math.round(artH)  + 'px';
+}
+
+// Call positionCardArt on all visible hand cards
+function positionAllCardArts() {
+  document.querySelectorAll('#hand-container .hc').forEach(positionCardArt);
+}
 
 function makeHcEl(card, i, isHidden) {
   const el = document.createElement('div');
@@ -3222,6 +3254,17 @@ function updatePlayHandBtn() {
   btn.textContent = sel > 0 ? `PLAY ${sel}` : 'SELECT CARDS';
 }
 
+// Clone an .hc card element as a fly-ghost at its current screen position
+function _makeCardGhost(orig) {
+  const rect = orig.getBoundingClientRect();
+  const tilt = parseFloat(orig.style.getPropertyValue('--tilt')) || 0;
+  const clone = orig.cloneNode(true);
+  clone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:8px;overflow:hidden;background:#ffffff;border:2px solid rgba(50,70,140,0.8);z-index:500;pointer-events:none;perspective:600px;transform-style:preserve-3d;transform:rotate(${tilt}deg);box-shadow:0 4px 14px rgba(0,0,0,0.8);will-change:transform,opacity;margin:0;flex:none;animation:none;transition:none;`;
+  // Remove animation classes and interaction
+  clone.classList.remove('hc-floating','selected-hand');
+  clone.removeAttribute('id');
+  return {ghost:clone, tilt};
+}
 async function discardSelected() {
   if(typeof SFX!=='undefined') SFX.discard();
   if(!G.ourTurn || G.animating || G_selected.size === 0) return;
@@ -3259,11 +3302,7 @@ async function discardSelected() {
     const orig = hcEls[idx];
     if(!orig) return;
     const rect = orig.getBoundingClientRect();
-    const ghost = document.createElement('div');
-    ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:8px;overflow:hidden;background:#ffffff;border:2px solid rgba(50,70,140,0.8);z-index:500;pointer-events:none;perspective:600px;transform-style:preserve-3d;transform:rotate(${parseFloat(orig.style.getPropertyValue('--tilt'))||0}deg);box-shadow:0 4px 14px rgba(0,0,0,0.8);will-change:transform,opacity;`;
-    const artImg = orig.querySelector('.hc-art');
-    if(artImg){ const gi=document.createElement('img');gi.src=artImg.src;gi.draggable=false;gi.style.cssText=`position:absolute;top:6%;bottom:10%;left:50%;transform:translateX(-50%);height:84%;width:auto;object-fit:contain;image-rendering:pixelated;`;ghost.appendChild(gi); }
-    orig.querySelectorAll('.hc-type1,.hc-type2').forEach(b=>ghost.appendChild(b.cloneNode(true)));
+    const {ghost, tilt:_tilt1} = _makeCardGhost(orig);
     document.body.appendChild(ghost);
     orig.style.opacity = '0';
     orig.style.pointerEvents = 'none';
@@ -19760,26 +19799,17 @@ function beginHandDrag(cardEl, sx, sy) {
   const W = nat0.w, H = nat0.h;
 
   // Ghost: full-fidelity floating card
-  const ghost = document.createElement('div');
-  ghost.style.cssText = [
-    'position:fixed',
-    `left:${nat0.left}px`, `top:${nat0.top}px`,
-    `width:${W}px`, `height:${H}px`,
-    'z-index:9900', 'pointer-events:none',
-    'border-radius:8px', 'overflow:hidden',
-    'background:#fff', 'border:2px solid rgba(50,70,140,0.8)',
-    'box-shadow:0 28px 64px rgba(0,0,0,0.92),0 0 0 2px rgba(110,175,255,0.95),0 0 40px rgba(80,140,255,0.4)',
-    'transform:scale(1.06)', 'transform-origin:50% 80%', 'transition:none',
-  ].join(';');
-  const srcArt = cardEl.querySelector('.hc-art');
-  if(srcArt) {
-    const img = new Image();
-    img.src = srcArt.src; img.draggable = false;
-    img.style.cssText = 'position:absolute;top:6%;left:50%;transform:translateX(-50%);height:84%;width:auto;object-fit:contain;image-rendering:pixelated;';
-    ghost.appendChild(img);
-  }
-  const srcBadge = cardEl.querySelector('.hc-type1');
-  if(srcBadge) ghost.appendChild(srcBadge.cloneNode(true));
+  const {ghost} = _makeCardGhost(cardEl);
+  ghost.style.position = 'fixed';
+  ghost.style.left = nat0.left + 'px';
+  ghost.style.top  = nat0.top  + 'px';
+  ghost.style.width  = W + 'px';
+  ghost.style.height = H + 'px';
+  ghost.style.zIndex = '9900';
+  ghost.style.boxShadow = '0 28px 64px rgba(0,0,0,0.92),0 0 0 2px rgba(110,175,255,0.95),0 0 40px rgba(80,140,255,0.4)';
+  ghost.style.transform = 'scale(1.06)';
+  ghost.style.transformOrigin = '50% 80%';
+  ghost.style.transition = 'none';
   document.body.appendChild(ghost);
 
   // Slot card: invisible AND width collapses so neighbours close the gap
@@ -21764,12 +21794,7 @@ async function playSelectedHand() {
           }
           if(matchEl) {
             const rect = matchEl.getBoundingClientRect();
-            const ghost = document.createElement('div');
-            ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:8px;overflow:hidden;background:#ffffff;border:2px solid rgba(50,70,140,0.8);z-index:500;pointer-events:none;perspective:600px;transform-style:preserve-3d;box-shadow:0 4px 14px rgba(0,0,0,0.8);`;
-            const ai = matchEl.querySelector('.hc-art');
-            if(ai){ const gi=document.createElement('img');gi.src=ai.src;gi.draggable=false;gi.style.cssText='position:absolute;top:6%;bottom:10%;left:50%;transform:translateX(-50%);height:84%;width:auto;object-fit:contain;image-rendering:pixelated;';ghost.appendChild(gi); }
-            matchEl.querySelectorAll('.hc-type1,.hc-type2').forEach(b=>ghost.appendChild(b.cloneNode(true)));
-            document.body.appendChild(ghost);
+            const {ghost} = _makeCardGhost(matchEl);
             matchEl.style.opacity = '0'; matchEl.style.pointerEvents = 'none';
             const tilt = parseFloat(matchEl.style.getPropertyValue('--tilt')) || 0;
             setTimeout(()=>{
@@ -21850,11 +21875,7 @@ async function playSelectedHand() {
       const FLY0 = 0.50;
       const tilt = parseFloat(_playedEl.style.getPropertyValue('--tilt')) || 0;
       // Create ghost at card's current position
-      const ghost = document.createElement('div');
-      ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:8px;overflow:hidden;background:#ffffff;border:2px solid rgba(50,70,140,0.8);z-index:500;pointer-events:none;perspective:600px;transform-style:preserve-3d;box-shadow:0 4px 14px rgba(0,0,0,0.8);transform:rotate(${tilt}deg);`;
-      const ai = _playedEl.querySelector('.hc-art');
-      if(ai){ const gi=document.createElement('img');gi.src=ai.src;gi.draggable=false;gi.style.cssText='position:absolute;top:6%;bottom:10%;left:50%;transform:translateX(-50%);height:84%;width:auto;object-fit:contain;image-rendering:pixelated;';ghost.appendChild(gi); }
-      _playedEl.querySelectorAll('.hc-type1,.hc-type2').forEach(b=>ghost.appendChild(b.cloneNode(true)));
+      const {ghost} = _makeCardGhost(_playedEl);
       document.body.appendChild(ghost);
       _playedEl.style.opacity = '0';
       // Animate ghost flying off right (discard fly)
@@ -21884,6 +21905,8 @@ async function playSelectedHand() {
       if(typeof renderHandsPanel==='function') renderHandsPanel();
       updateRunPanel();
       updateActionBar();
+      // Position art after reflow settles
+      setTimeout(positionAllCardArts, 60);
     });
     // Don't call opp attack — player gets another turn
     return;
@@ -24197,30 +24220,74 @@ function buildDeckOf(coreDexNums, fillDexNums, target) {
   return shuffle(pool.slice(0, target)).map(f=>mkCard(f));
 }
 
+function buildVenomDeck() {
+  // Poison/Draw: stack poison, amplify, convert to burst damage
+  const coreDex = [1,2,3,13,23,31,43,45,70,89,110]; // pure poison
+  const drawDex = [10,19,44,88,109];                  // discard/draw synergy
+  const ampDex  = [24,29];                            // debuff/status amp
+  const sh = a => { for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+  const deck = [];
+  // 3× core poison cards (11 types × 3 ≈ 33, trim to 18)
+  coreDex.forEach(d => { for(let i=0;i<3;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  // 2× draw synergy (5 types × 2 = 10)
+  drawDex.forEach(d => { for(let i=0;i<2;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  // 1× amp cards
+  ampDex.forEach(d => { const c=mkBasicCard(d);if(c)deck.push(c); });
+  return sh(deck).slice(0,30);
+}
+
+function buildStoreDeck() {
+  // Store/Combo: build combo stacks and stored damage, release for massive hits
+  const comboDex = [32,33,34,56,57,107,98];           // combo build/release
+  const storeDex = [27,28,50,51,104,120,140,143,148]; // store damage
+  const releaseDex = [99,130,141,149];                 // release stored ×2/×3
+  const sh = a => { for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+  const deck = [];
+  comboDex.forEach(d  => { for(let i=0;i<3;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  storeDex.forEach(d  => { for(let i=0;i<2;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  releaseDex.forEach(d=> { for(let i=0;i<2;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  return sh(deck).slice(0,30);
+}
+
+function buildChainDeck() {
+  // Electric/Chain/Draw: chain cards together, draw more, massive link bonuses
+  const elecDex  = [25,81,125,135];          // electric draw/link
+  const chainDex = [22,84,17,18,82];         // chain/position bonuses
+  const burstDex = [100,101,10,19,26];       // discard-draw burst
+  const storeDex = [27,51,99,120];           // store support
+  const sh = a => { for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+  const deck = [];
+  elecDex.forEach(d  => { for(let i=0;i<4;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  chainDex.forEach(d => { for(let i=0;i<3;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  burstDex.forEach(d => { for(let i=0;i<2;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  storeDex.forEach(d => { for(let i=0;i<1;i++){const c=mkBasicCard(d);if(c)deck.push(c);} });
+  return sh(deck).slice(0,30);
+}
+
 const STARTER_DECKS = [
   {
-    id:'type', name:'TYPE TECHNICIAN', difficulty:'Beginner', emoji:'🔥', accent:'#ff6633',
-    subtitle:'Master a single type',
-    ability:'Consistent type-hand scoring every round',
-    weakness:'Harder to hit rare high-scoring hands',
-    handFocus:'Type Team / Dual Type Team',
-    buildDeck: buildTypeDeck,
+    id:'venom', name:'VENOM ENGINE', difficulty:'Beginner', emoji:'☠', accent:'#9933cc',
+    subtitle:'Stack poison. Convert to burst.',
+    ability:'Poison stacks compound — then explode for massive damage',
+    weakness:'Slower against high-block enemies',
+    handFocus:'Poison / Draw / Convert',
+    buildDeck: buildVenomDeck,
   },
   {
-    id:'species', name:'SPECIES SPECIALIST', difficulty:'Normal', emoji:'⚡', accent:'#ffdd00',
-    subtitle:'Repeated species = explosive scoring',
-    ability:'Species Pair/Trio/Squad hands scale massively',
-    weakness:'Vulnerable if a boss punishes your main species',
-    handFocus:'Species Pair / Trio / Army',
-    buildDeck: buildSpeciesDeck,
+    id:'store', name:'STORED FURY', difficulty:'Normal', emoji:'💥', accent:'#cc4400',
+    subtitle:'Build. Store. Release everything.',
+    ability:'Combo stacks and stored damage compound across turns',
+    weakness:'Needs setup — vulnerable if disrupted early',
+    handFocus:'Combo / Store / Release',
+    buildDeck: buildStoreDeck,
   },
   {
-    id:'evolution', name:'EVOLUTION ENGINEER', difficulty:'Expert', emoji:'🌿', accent:'#44dd66',
-    subtitle:'Build chains, evolve your strategy',
-    ability:'Evolution combos unlock powerful scaling',
-    weakness:'Slow early game — needs setup turns',
-    handFocus:'Evolution Line / Evolution Family',
-    buildDeck: buildEvolutionDeck,
+    id:'chain', name:'LIGHTNING CHAIN', difficulty:'Expert', emoji:'⚡', accent:'#ffdd00',
+    subtitle:'Draw. Chain. Surge.',
+    ability:'Electric cards chain together for exponential damage bonuses',
+    weakness:'Needs multiple electric cards in hand to activate',
+    handFocus:'Electric / Draw / Chain',
+    buildDeck: buildChainDeck,
   },
 ];
 
@@ -24235,7 +24302,7 @@ function initStarterDeckScreen() {
   });
   // Start music on first user interaction
   document.addEventListener('click', ()=>{
-    if(!_rotomAudio) { rotomLoad(_rotomIdx, true); _rotomPlaying=true; }
+    if(typeof _rotomAudio!=='undefined' && !_rotomAudio) { rotomLoad(_rotomIdx, true); _rotomPlaying=true; }
   }, {once:true});
   document.body.classList.add('game-active');
   // Use Erika's grass palette for starter screen
@@ -24402,33 +24469,10 @@ function beginBattleWithDeck(deckId){
 
 <script>
 // Show proper starter deck selection screen
-// Use setTimeout(0) to ensure all DOM elements are fully available
-setTimeout(()=>{ initStarterDeckScreen(); initCardTooltip(); }, 0);
-
-// Autoplay music immediately — browsers may block, fallback to first interaction
-(function tryAutoplay() {
-  let started = false;
-  function startMusic() {
-    if(started) return;
-    if(!_rotomAudio) rotomLoad(_rotomIdx, false);
-    _rotomAudio.play().then(() => {
-      started = true;
-      _rotomPlaying = true;
-      rotomUpdateUI();
-    }).catch(() => {}); // Browser blocked silently
-  }
-  // 1. Try immediately
-  setTimeout(startMusic, 200);
-  // 2. Try after a short delay (some browsers allow after page settles)
-  setTimeout(startMusic, 1500);
-  // 3. Guaranteed unlock on first interaction
-  ['pointerdown','touchstart','mousedown','keydown'].forEach(e =>
-    document.addEventListener(e, function f() {
-      startMusic();
-      document.removeEventListener(e, f);
-    }, {passive:true})
-  );
-})();
+setTimeout(()=>{
+  try { initStarterDeckScreen(); } catch(e) {}
+  try { initCardTooltip(); } catch(e) {}
+}, 0);
 </script>
 
 <script>
@@ -24773,10 +24817,7 @@ function applyItemEffect(item) {
 
 function startNextBattle() {
   if(typeof resetDialogue==='function') resetDialogue();
-  if(typeof SFX!=='undefined') {
-    const t=getCurrentTrainer();
-    SFX.battleStart(t&&t.tier==='boss');
-  }
+  try { if(typeof SFX!=='undefined') { const t=getCurrentTrainer(); SFX.battleStart(t&&t.tier==='boss'); } } catch(e) {}
   const shopScreen = document.getElementById('shop-screen');
   if (shopScreen) shopScreen.classList.add('hidden');
   // Show game UI for next battle
